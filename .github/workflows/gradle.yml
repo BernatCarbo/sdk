@@ -26,7 +26,7 @@ jobs:
       - name: Check SPM publication
         id: check_spm_publication
         run: |
-          if aws s3 ls s3://cdn.doordeck.com/xcframework/v1.0.0/ > /dev/null 2>&1; then
+          if aws s3 ls s3://cdn.doordeck.com/xcframework/v1.0.0/DoordeckSDK.xcframework.zip > /dev/null 2>&1; then
             echo "spmPublished=true" >> "$GITHUB_OUTPUT"
           else
             echo "spmPublished=false" >> "$GITHUB_OUTPUT"
