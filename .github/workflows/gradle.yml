@@ -27,8 +27,8 @@ jobs:
         id: check_spm_publication
         run: |
           if aws s3 ls s3://cdn.doordeck.com/xcframework/v1.0.0/ > /dev/null 2>&1; then
-            echo spmPublished=true >> $GITHUB_OUTPUT
+            echo spmPublished='true' >> "$GITHUB_OUTPUT"
           else
-            echo spmPublished=false >> $GITHUB_OUTPUT
+            echo spmPublished='false' >> "$GITHUB_OUTPUT"
           fi
           echo "The value of spmPublished is: ${{steps.check_spm_publication.outputs.spmPublished}}"
