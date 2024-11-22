@@ -31,4 +31,4 @@ jobs:
           else
             echo "spmPublished=false" >> $GITHUB_ENV
           fi
-          echo "The value of spmPublished is: ${{env.spmPublished}}"
+          echo "The value of spmPublished is: ${{steps.check_spm_publication.outputs.spmPublished}}"
