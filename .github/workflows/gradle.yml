@@ -32,6 +32,7 @@ jobs:
           else
             echo "spmPublished=false" >> "$GITHUB_OUTPUT"
           fi
+          'echo value is: $HTTP_STATUS'
 
       - name: Display SPM Publication Value
         run: 'echo The value of spmPublished is: ${{steps.check_spm_publication.outputs.spmPublished}}'
