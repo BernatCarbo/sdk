@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "doordeck-headless-sdk"
+rootProject.name = "sdk"
 include(":doordeck-sdk")
