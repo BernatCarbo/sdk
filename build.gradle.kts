@@ -1,5 +1,4 @@
 plugins {
-    //trick: for the same plugin versions in all submodules
     alias(libs.plugins.androidLibrary).apply(false)
     alias(libs.plugins.kotlinMultiplatform).apply(false)
     alias(libs.plugins.kotlinxSerialization).apply(false)
@@ -21,18 +20,12 @@ nexusPublishing {
     }
 }
 
-tasks.register("updatePackageSwift") {
-    val packageVersion: String? by project
-    val packageChecksum: String? by project
-
-    doLast {
-        if (!packageVersion.isNullOrEmpty() && !packageChecksum.isNullOrEmpty()) {
-            val packageFile = file("Package.swift")
-            val content = packageFile.readText()
-            val updatedContent = content
-                .replace(Regex("""url: ".*""""), """url: "https://cdn.doordeck.com/xcframework/v$packageVersion/DoordeckSDK.xcframework.zip"""")
-                .replace(Regex("""checksum: ".*""""), """checksum: "$packageChecksum"""")
-            packageFile.writeText(updatedContent)
-        }
+// Force some JS dependencies to use specific versions (yarn.lock)
+rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
+    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension>().apply {
+        resolution("cross-spawn", "7.0.6")
+        resolution("ws", "8.17.1")
+        resolution("webpack", "5.94.0")
+        resolution("path-to-regexp", "0.1.12")
     }
 }

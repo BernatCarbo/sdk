@@ -11,28 +11,51 @@ on:
       - 'main'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+
+  release:
+    name: Releases
+    if: (success() && github.ref == 'refs/heads/main') || startsWith(github.ref, 'refs/tags/v')
+    runs-on: macos-latest
+
+    permissions:
+      id-token: write
+      contents: write
+      packages: write
+
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Java
+        with:
+          fetch-depth: 0
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "Doordeck Development"
+          git config --global user.email "development@doordeck.com"
+
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: corretto
           java-version: 21
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Check SPM publication
-        id: check_spm_publication
-        run: |
-          HTTP_STATUS=$(curl -LI https://cdn.doordeck.com/xcframework/v1.0.0/DoordeckSDK.xcframework.zip -o /dev/null -w '%{http_code}\n' -s)
-          if [ "$HTTP_STATUS" -eq 200 ]; then
-            echo "spmPublished=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "spmPublished=false" >> "$GITHUB_OUTPUT"
-          fi
-          'echo value is: $HTTP_STATUS'
+      - name: Tag for release (if on main)
+        if: github.ref == 'refs/heads/main'
+        run: ./gradlew final -x test
 
-      - name: Display SPM Publication Value
-        run: 'echo The value of spmPublished is: ${{steps.check_spm_publication.outputs.spmPublished}}'
+      - name: Parse release version
+        id: version_info
+        run: echo version=$(./gradlew properties -q -Prelease.useLastTag=true | grep "version:" | awk '{print $2}') >> "$GITHUB_OUTPUT"
+
+      - name: Publish to SPM
+        if: github.ref == 'refs/heads/main'
+        run: |
+          ./gradlew assembleDoordeckSDKReleaseXCFramework
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v${{ steps.version_info.outputs.version }} --title "Release v${{ steps.version_info.outputs.version }}" --verify-tag --generate-notes

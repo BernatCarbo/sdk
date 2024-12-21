@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'DoordeckSDK'
-    spec.version                  = '1.1.0-dev.0.uncommitted+c23f153'
-    spec.homepage                 = 'https://www.doordeck.com/'
+    spec.version                  = '0.52.0-dev.0.uncommitted+5c447cf'
+    spec.homepage                 = 'https://www.doordeck.com'
     spec.source                   = { :http=> ''}
     spec.authors                  = 'Doordeck Limited'
     spec.license                  = { :type => 'Apache-2.0' }

@@ -1,5 +1,6 @@
 package com.doordeck.multiplatform.sdk.api
 
+import com.doordeck.multiplatform.sdk.api.model.Crypto
 import com.doordeck.multiplatform.sdk.storage.SecureStorage
 import kotlin.js.JsExport
 
@@ -7,9 +8,24 @@ import kotlin.js.JsExport
 interface ContextManager {
 
     fun setAuthToken(token: String)
-    fun setOperationContext(userId: String, certificateChain: List<String>, privateKey: ByteArray)
-    fun setOperationContextJson(data: String)
+    fun getAuthToken(): String?
+    fun isAuthTokenAboutToExpire(): Boolean
+    fun setRefreshToken(token: String)
+    fun getRefreshToken(): String?
     fun setFusionAuthToken(token: String)
+    fun getFusionAuthToken(): String?
+    fun setUserId(userId: String)
+    fun getUserId(): String?
+    fun setUserEmail(email: String)
+    fun getUserEmail(): String?
+    fun setCertificateChain(certificateChain: List<String>)
+    fun getCertificateChain(): List<String>?
+    fun isCertificateChainAboutToExpire(): Boolean
+    fun setKeyPair(publicKey: ByteArray, privateKey: ByteArray)
+    fun getKeyPair(): Crypto.KeyPair?
+    fun isKeyPairValid(): Boolean
+    fun setOperationContext(userId: String, certificateChain: List<String>, publicKey: ByteArray, privateKey: ByteArray)
+    fun setOperationContextJson(data: String)
     fun setSecureStorageImpl(secureStorage: SecureStorage)
     fun loadContext()
     fun storeContext()
