@@ -389,6 +389,11 @@ tasks.register("pythonPack").configure {
         // Copy the readme file
         copy {
             from(rootProject.layout.projectDirectory.file("README.md"))
+            into(file("$outputDir/${pypiPublish.packageName}"))
+        }
+        // Copy python resources
+        copy {
+            from(file("$projectDir/src/mingwMain/resources/python"))
             into(outputDir)
         }
     }
