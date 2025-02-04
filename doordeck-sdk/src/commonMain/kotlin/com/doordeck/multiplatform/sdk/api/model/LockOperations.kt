@@ -9,14 +9,14 @@ import kotlin.uuid.Uuid
 @JsExport
 object LockOperations {
 
-    class TimeRequirement(
+    data class TimeRequirement(
         val start: String, // HH:mm
         val end: String, // HH:mm
         val timezone: String,
         val days: List<String>
     )
 
-    class LocationRequirement @JvmOverloads constructor(
+    data class LocationRequirement @JvmOverloads constructor(
         val latitude: Double,
         val longitude: Double,
         val enabled: Boolean? = null,
@@ -24,7 +24,7 @@ object LockOperations {
         val accuracy: Int? = null
     )
 
-    class UnlockBetween @JvmOverloads constructor(
+    data class UnlockBetween @JvmOverloads constructor(
         val start: String, // HH:mm
         val end: String, // HH:mm
         val timezone: String,
@@ -32,17 +32,17 @@ object LockOperations {
         val exceptions: List<String>? = null
     )
 
-    class UnlockOperation @JvmOverloads constructor(
+    data class UnlockOperation @JvmOverloads constructor(
         val baseOperation: BaseOperation,
         val directAccessEndpoints: List<String>? = null
     ): Operation
 
-    class ShareLockOperation(
+    data class ShareLockOperation(
         val baseOperation: BaseOperation,
         val shareLock: ShareLock
     ): Operation
 
-    class ShareLock @JvmOverloads constructor(
+    data class ShareLock @JvmOverloads constructor(
         val targetUserId: String,
         val targetUserRole: UserRole,
         val targetUserPublicKey: ByteArray,
@@ -50,22 +50,27 @@ object LockOperations {
         val end: Int? = null
     )
 
-    class RevokeAccessToLockOperation(
+    data class BatchShareLockOperation(
+        val baseOperation: BaseOperation,
+        val users: List<ShareLock>
+    ): Operation
+
+    data class RevokeAccessToLockOperation(
         val baseOperation: BaseOperation,
         val users: List<String>
     ): Operation
 
-    class UpdateSecureSettingUnlockDuration(
+    data class UpdateSecureSettingUnlockDuration(
         val baseOperation: BaseOperation,
         val unlockDuration: Int
     ): Operation
 
-    class UpdateSecureSettingUnlockBetween @JvmOverloads constructor(
+    data class UpdateSecureSettingUnlockBetween @JvmOverloads constructor(
         val baseOperation: BaseOperation,
         val unlockBetween: UnlockBetween? = null
     ): Operation
 
-    class BaseOperation @JvmOverloads constructor(
+    data class BaseOperation @JvmOverloads constructor(
         val userId: String? = null,
         val userCertificateChain: List<String>? = null,
         val userPrivateKey: ByteArray? = null,
@@ -78,3 +83,23 @@ object LockOperations {
 
     sealed interface Operation
 }
+
+/**
+ * Creates a new instance of `LockOperations.BaseOperation` with a newly generated JTI (JSON Token Identifier).
+ *
+ * The new instance retains all the properties of the original operation except for the JTI,
+ * which is replaced with a randomly generated UUID.
+ *
+ * @receiver The original `LockOperations.BaseOperation` instance.
+ * @return A new `LockOperations.BaseOperation` instance with the same properties as the receiver but with a new JTI.
+ */
+internal fun LockOperations.BaseOperation.withNewJti() = LockOperations.BaseOperation(
+    userId = userId,
+    userCertificateChain = userCertificateChain,
+    userPrivateKey = userPrivateKey,
+    lockId = lockId,
+    notBefore = notBefore,
+    issuedAt = issuedAt,
+    expiresAt = expiresAt,
+    jti = Uuid.random().toString()
+)

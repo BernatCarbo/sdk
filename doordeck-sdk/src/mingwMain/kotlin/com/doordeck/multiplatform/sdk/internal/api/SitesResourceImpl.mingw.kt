@@ -7,36 +7,40 @@ import com.doordeck.multiplatform.sdk.api.responses.SiteLocksResponse
 import com.doordeck.multiplatform.sdk.api.responses.SiteResponse
 import com.doordeck.multiplatform.sdk.api.responses.UserForSiteResponse
 import com.doordeck.multiplatform.sdk.util.fromJson
-import com.doordeck.multiplatform.sdk.util.toJson
+import com.doordeck.multiplatform.sdk.util.resultData
 import kotlinx.coroutines.runBlocking
 
-internal class SitesResourceImpl(
-    private val sitesClient: SitesClient
-) : SitesResource {
+internal object SitesResourceImpl : SitesResource {
 
     override fun listSites(): List<SiteResponse> {
-        return runBlocking { sitesClient.listSitesRequest() }
+        return runBlocking { SitesClient.listSitesRequest() }
     }
 
     override fun listSitesJson(): String {
-        return listSites().toJson()
+        return resultData {
+            listSites()
+        }
     }
 
     override fun getLocksForSite(siteId: String): List<SiteLocksResponse> {
-        return runBlocking { sitesClient.getLocksForSiteRequest(siteId) }
+        return runBlocking { SitesClient.getLocksForSiteRequest(siteId) }
     }
 
     override fun getLocksForSiteJson(data: String): String {
-        val getLocksForSiteData = data.fromJson<GetLocksForSiteData>()
-        return getLocksForSite(getLocksForSiteData.siteId).toJson()
+        return resultData {
+            val getLocksForSiteData = data.fromJson<GetLocksForSiteData>()
+            getLocksForSite(getLocksForSiteData.siteId)
+        }
     }
 
     override fun getUsersForSite(siteId: String): List<UserForSiteResponse> {
-        return runBlocking { sitesClient.getUsersForSiteRequest(siteId) }
+        return runBlocking { SitesClient.getUsersForSiteRequest(siteId) }
     }
 
     override fun getUsersForSiteJson(data: String): String {
-        val getUsersForSiteData = data.fromJson<GetUsersForSiteData>()
-        return getUsersForSite(getUsersForSiteData.siteId).toJson()
+        return resultData {
+            val getUsersForSiteData = data.fromJson<GetUsersForSiteData>()
+            getUsersForSite(getUsersForSiteData.siteId)
+        }
     }
 }

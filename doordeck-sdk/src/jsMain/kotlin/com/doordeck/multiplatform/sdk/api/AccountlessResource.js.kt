@@ -1,9 +1,7 @@
 package com.doordeck.multiplatform.sdk.api
 
 import com.doordeck.multiplatform.sdk.api.responses.TokenResponse
-import com.doordeck.multiplatform.sdk.internal.api.AccountlessClient
 import com.doordeck.multiplatform.sdk.internal.api.AccountlessResourceImpl
-import org.koin.mp.KoinPlatform.getKoin
 import kotlin.js.Promise
 
 @JsExport
@@ -20,7 +18,7 @@ actual interface AccountlessResource {
      *
      * @see <a href="https://developer.doordeck.com/docs/#registration-v3">API Doc</a>
      */
-    fun registration(email: String, password: String, displayName: String? = null, force: Boolean = false): Promise<TokenResponse>
+    fun registration(email: String, password: String, displayName: String? = null, force: Boolean = false, publicKey: ByteArray? = null): Promise<TokenResponse>
 
     /**
      * Verify email
@@ -28,9 +26,19 @@ actual interface AccountlessResource {
      * @see <a href="https://developer.doordeck.com/docs/#verify-email">API Doc</a>
      */
     fun verifyEmail(code: String): Promise<dynamic>
+
+    /**
+     * Password reset
+     */
+    fun passwordReset(email: String): Promise<dynamic>
+
+    /**
+     * Password reset verify
+     */
+    fun passwordResetVerify(userId: String, token: String, password: String): Promise<dynamic>
 }
 
-private val accountless = AccountlessResourceImpl(getKoin().get<AccountlessClient>())
+private val accountless = AccountlessResourceImpl
 
 @JsExport
 actual fun accountless(): AccountlessResource = accountless

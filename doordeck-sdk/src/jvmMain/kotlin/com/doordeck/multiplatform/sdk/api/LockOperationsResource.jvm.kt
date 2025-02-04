@@ -9,9 +9,7 @@ import com.doordeck.multiplatform.sdk.api.responses.ShareableLockResponse
 import com.doordeck.multiplatform.sdk.api.responses.UserLockResponse
 import com.doordeck.multiplatform.sdk.api.responses.UserPublicKeyResponse
 import com.doordeck.multiplatform.sdk.internal.api.DoordeckOnly
-import com.doordeck.multiplatform.sdk.internal.api.LockOperationsClient
 import com.doordeck.multiplatform.sdk.internal.api.LockOperationsResourceImpl
-import org.koin.mp.KoinPlatform.getKoin
 import java.util.concurrent.CompletableFuture
 
 actual interface LockOperationsResource {
@@ -243,6 +241,15 @@ actual interface LockOperationsResource {
     fun shareLockAsync(shareLockOperation: LockOperations.ShareLockOperation): CompletableFuture<Unit>
 
     /**
+     * Batch share a lock
+     *
+     * @see <a href="https://developer.doordeck.com/docs/#batch-share-a-lock-v2">API Doc</a>
+     */
+    suspend fun batchShareLock(batchShareLockOperation: LockOperations.BatchShareLockOperation)
+
+    fun batchShareLockAsync(batchShareLockOperation: LockOperations.BatchShareLockOperation): CompletableFuture<Unit>
+
+    /**
      * Revoke access to a lock
      *
      * @see <a href="https://developer.doordeck.com/docs/#revoke-access-to-a-lock">API Doc</a>
@@ -288,4 +295,4 @@ actual interface LockOperationsResource {
     fun getShareableLocksAsync(): CompletableFuture<List<ShareableLockResponse>>
 }
 
-actual fun lockOperations(): LockOperationsResource = LockOperationsResourceImpl(getKoin().get<LockOperationsClient>())
+actual fun lockOperations(): LockOperationsResource = LockOperationsResourceImpl

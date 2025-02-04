@@ -5,9 +5,7 @@ import com.doordeck.multiplatform.sdk.api.responses.ApplicationOwnerDetailsRespo
 import com.doordeck.multiplatform.sdk.api.responses.ApplicationResponse
 import com.doordeck.multiplatform.sdk.api.responses.GetLogoUploadUrlResponse
 import com.doordeck.multiplatform.sdk.internal.api.DoordeckOnly
-import com.doordeck.multiplatform.sdk.internal.api.PlatformClient
 import com.doordeck.multiplatform.sdk.internal.api.PlatformResourceImpl
-import org.koin.mp.KoinPlatform.getKoin
 
 actual interface PlatformResource {
     /**
@@ -17,8 +15,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun createApplication(application: Platform.CreateApplication)
+
     @DoordeckOnly
-    fun createApplicationJson(data: String)
+    @CName("createApplicationJson")
+    fun createApplicationJson(data: String): String
 
     /**
      * List applications
@@ -27,7 +27,9 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun listApplications(): List<ApplicationResponse>
+
     @DoordeckOnly
+    @CName("listApplicationsJson")
     fun listApplicationsJson(): String
 
     /**
@@ -37,7 +39,9 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun getApplication(applicationId: String): ApplicationResponse
+
     @DoordeckOnly
+    @CName("getApplicationJson")
     fun getApplicationJson(data: String): String
 
     /**
@@ -47,8 +51,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun updateApplicationName(applicationId: String, name: String)
+
     @DoordeckOnly
-    fun updateApplicationNameJson(data: String)
+    @CName("updateApplicationNameJson")
+    fun updateApplicationNameJson(data: String): String
 
     /**
      * Update application - Company name
@@ -57,8 +63,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun updateApplicationCompanyName(applicationId: String, companyName: String)
+
     @DoordeckOnly
-    fun updateApplicationCompanyNameJson(data: String)
+    @CName("updateApplicationCompanyNameJson")
+    fun updateApplicationCompanyNameJson(data: String): String
 
     /**
      * Update application - Mailing address
@@ -67,8 +75,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun updateApplicationMailingAddress(applicationId: String, mailingAddress: String)
+
     @DoordeckOnly
-    fun updateApplicationMailingAddressJson(data: String)
+    @CName("updateApplicationMailingAddressJson")
+    fun updateApplicationMailingAddressJson(data: String): String
 
     /**
      * Update application - Privacy policy
@@ -77,8 +87,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun updateApplicationPrivacyPolicy(applicationId: String, privacyPolicy: String)
+
     @DoordeckOnly
-    fun updateApplicationPrivacyPolicyJson(data: String)
+    @CName("updateApplicationPrivacyPolicyJson")
+    fun updateApplicationPrivacyPolicyJson(data: String): String
 
     /**
      * Update application - Support contact
@@ -87,8 +99,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun updateApplicationSupportContact(applicationId: String, supportContact: String)
+
     @DoordeckOnly
-    fun updateApplicationSupportContactJson(data: String)
+    @CName("updateApplicationSupportContactJson")
+    fun updateApplicationSupportContactJson(data: String): String
 
     /**
      * Update application - App link
@@ -97,8 +111,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun updateApplicationAppLink(applicationId: String, appLink: String)
+
     @DoordeckOnly
-    fun updateApplicationAppLinkJson(data: String)
+    @CName("updateApplicationAppLinkJson")
+    fun updateApplicationAppLinkJson(data: String): String
 
     /**
      * Update application - Email preferences
@@ -107,8 +123,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun updateApplicationEmailPreferences(applicationId: String, emailPreferences: Platform.EmailPreferences)
+
     @DoordeckOnly
-    fun updateApplicationEmailPreferencesJson(data: String)
+    @CName("updateApplicationEmailPreferencesJson")
+    fun updateApplicationEmailPreferencesJson(data: String): String
 
     /**
      * Update application - Logo url
@@ -117,8 +135,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun updateApplicationLogoUrl(applicationId: String, logoUrl: String)
+
     @DoordeckOnly
-    fun updateApplicationLogoUrlJson(data: String)
+    @CName("updateApplicationLogoUrlJson")
+    fun updateApplicationLogoUrlJson(data: String): String
 
     /**
      * Delete application
@@ -127,8 +147,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun deleteApplication(applicationId: String)
+
     @DoordeckOnly
-    fun deleteApplicationJson(data: String)
+    @CName("deleteApplicationJson")
+    fun deleteApplicationJson(data: String): String
 
     /**
      * Get logo upload URL
@@ -137,7 +159,9 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun getLogoUploadUrl(applicationId: String, contentType: String): GetLogoUploadUrlResponse
+
     @DoordeckOnly
+    @CName("getLogoUploadUrlJson")
     fun getLogoUploadUrlJson(data: String): String
 
     /**
@@ -147,8 +171,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun addAuthKey(applicationId: String, key: Platform.AuthKey)
+
     @DoordeckOnly
-    fun addAuthKeyJson(data: String)
+    @CName("addAuthKeyJson")
+    fun addAuthKeyJson(data: String): String
 
     /**
      * Add auth issuer
@@ -157,8 +183,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun addAuthIssuer(applicationId: String, url: String)
+
     @DoordeckOnly
-    fun addAuthIssuerJson(data: String)
+    @CName("addAuthIssuerJson")
+    fun addAuthIssuerJson(data: String): String
 
     /**
      * Delete auth issuer
@@ -167,8 +195,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun deleteAuthIssuer(applicationId: String, url: String)
+
     @DoordeckOnly
-    fun deleteAuthIssuerJson(data: String)
+    @CName("deleteAuthIssuerJson")
+    fun deleteAuthIssuerJson(data: String): String
 
     /**
      * Add CORS domain
@@ -177,8 +207,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun addCorsDomain(applicationId: String, url: String)
+
     @DoordeckOnly
-    fun addCorsDomainJson(data: String)
+    @CName("addCorsDomainJson")
+    fun addCorsDomainJson(data: String): String
 
     /**
      * Remove CORS domain
@@ -187,8 +219,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun removeCorsDomain(applicationId: String, url: String)
+
     @DoordeckOnly
-    fun removeCorsDomainJson(data: String)
+    @CName("removeCorsDomainJson")
+    fun removeCorsDomainJson(data: String): String
 
     /**
      * Add application owner
@@ -197,8 +231,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun addApplicationOwner(applicationId: String, userId: String)
+
     @DoordeckOnly
-    fun addApplicationOwnerJson(data: String)
+    @CName("addApplicationOwnerJson")
+    fun addApplicationOwnerJson(data: String): String
 
     /**
      * Remove application owner
@@ -207,8 +243,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun removeApplicationOwner(applicationId: String, userId: String)
+
     @DoordeckOnly
-    fun removeApplicationOwnerJson(data: String)
+    @CName("removeApplicationOwnerJson")
+    fun removeApplicationOwnerJson(data: String): String
 
     /**
      * Get application owners details
@@ -217,8 +255,10 @@ actual interface PlatformResource {
      */
     @DoordeckOnly
     fun getApplicationOwnersDetails(applicationId: String): List<ApplicationOwnerDetailsResponse>
+
     @DoordeckOnly
+    @CName("getApplicationOwnersDetailsJson")
     fun getApplicationOwnersDetailsJson(data: String): String
 }
 
-actual fun platform(): PlatformResource = PlatformResourceImpl(getKoin().get<PlatformClient>())
+actual fun platform(): PlatformResource = PlatformResourceImpl

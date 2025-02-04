@@ -1,12 +1,22 @@
 package com.doordeck.multiplatform.sdk.api
 
-import com.doordeck.multiplatform.sdk.TEST_HTTP_CLIENT
+import com.doordeck.multiplatform.sdk.AUDIT_RESPONSE
+import com.doordeck.multiplatform.sdk.BATCH_USER_PUBLIC_KEY_RESPONSE
+import com.doordeck.multiplatform.sdk.LOCK_RESPONSE
+import com.doordeck.multiplatform.sdk.LOCK_USER_RESPONSE
+import com.doordeck.multiplatform.sdk.MockTest
+import com.doordeck.multiplatform.sdk.PINNED_LOCKS_RESPONSE
+import com.doordeck.multiplatform.sdk.SHAREABLE_LOCKS_RESPONSE
 import com.doordeck.multiplatform.sdk.TestConstants.DEFAULT_LOCK_ID
 import com.doordeck.multiplatform.sdk.TestConstants.DEFAULT_USER_EMAIL
 import com.doordeck.multiplatform.sdk.TestConstants.DEFAULT_USER_ID
 import com.doordeck.multiplatform.sdk.TestConstants.TEST_MAIN_USER_PRIVATE_KEY
-import com.doordeck.multiplatform.sdk.TestConstants.TEST_MAIN_USER_PUBLIC_KEY
+import com.doordeck.multiplatform.sdk.USER_LOCK_RESPONSE
+import com.doordeck.multiplatform.sdk.USER_PUBLIC_KEY_RESPONSE
 import com.doordeck.multiplatform.sdk.api.model.BaseOperationData
+import com.doordeck.multiplatform.sdk.api.model.BatchShareLockOperationData
+import com.doordeck.multiplatform.sdk.api.model.CapabilityStatus
+import com.doordeck.multiplatform.sdk.api.model.CapabilityType
 import com.doordeck.multiplatform.sdk.api.model.GetAuditForUserData
 import com.doordeck.multiplatform.sdk.api.model.GetLockAuditTrailData
 import com.doordeck.multiplatform.sdk.api.model.GetLocksForUserData
@@ -38,281 +48,301 @@ import com.doordeck.multiplatform.sdk.api.model.UpdateLockSettingLocationRestric
 import com.doordeck.multiplatform.sdk.api.model.UpdateSecureSettingUnlockBetweenData
 import com.doordeck.multiplatform.sdk.api.model.UpdateSecureSettingUnlockDurationData
 import com.doordeck.multiplatform.sdk.api.model.UserRole
-import com.doordeck.multiplatform.sdk.internal.ContextManagerImpl
-import com.doordeck.multiplatform.sdk.internal.api.LocalUnlockClient
-import com.doordeck.multiplatform.sdk.internal.api.LockOperationsClient
+import com.doordeck.multiplatform.sdk.cache.CapabilityCache
 import com.doordeck.multiplatform.sdk.internal.api.LockOperationsResourceImpl
+import com.doordeck.multiplatform.sdk.toResultDataJson
 import com.doordeck.multiplatform.sdk.util.Utils.decodeBase64ToByteArray
 import com.doordeck.multiplatform.sdk.util.Utils.encodeByteArrayToBase64
 import com.doordeck.multiplatform.sdk.util.toJson
-import com.ionspin.kotlin.crypto.LibsodiumInitializer
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
-class LockOperationsResourceImplTest {
-
-    private val contextManager = ContextManagerImpl()
-    private val localUnlock = LocalUnlockClient(TEST_HTTP_CLIENT)
-    private val lockOperations = LockOperationsResourceImpl(LockOperationsClient(TEST_HTTP_CLIENT, contextManager, localUnlock))
-
-    init {
-        LibsodiumInitializer.initializeWithCallback {  }
-        contextManager.setOperationContext("", emptyList(), TEST_MAIN_USER_PUBLIC_KEY.decodeBase64ToByteArray(), TEST_MAIN_USER_PRIVATE_KEY.decodeBase64ToByteArray())
-    }
+class LockOperationsResourceImplTest : MockTest() {
 
     @Test
     fun shouldGetSingleLock() = runTest {
-        lockOperations.getSingleLock(DEFAULT_LOCK_ID)
+        val response = LockOperationsResourceImpl.getSingleLock(DEFAULT_LOCK_ID)
+        assertEquals(LOCK_RESPONSE, response)
     }
 
     @Test
     fun shouldGetSingleLockJson() = runTest {
-        lockOperations.getSingleLockJson(GetSingleLockData(DEFAULT_LOCK_ID).toJson())
+        val response = LockOperationsResourceImpl.getSingleLockJson(GetSingleLockData(DEFAULT_LOCK_ID).toJson())
+        assertEquals(LOCK_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldGetLockAuditTrail() = runTest {
-        lockOperations.getLockAuditTrail(DEFAULT_LOCK_ID, 0, 0)
+        val response = LockOperationsResourceImpl.getLockAuditTrail(DEFAULT_LOCK_ID, 0, 0)
+        assertEquals(AUDIT_RESPONSE, response)
     }
 
     @Test
     fun shouldGetLockAuditTrailJson() = runTest {
-        lockOperations.getLockAuditTrailJson(GetLockAuditTrailData(DEFAULT_LOCK_ID, 0, 0).toJson())
+        val response = LockOperationsResourceImpl.getLockAuditTrailJson(GetLockAuditTrailData(DEFAULT_LOCK_ID, 0, 0).toJson())
+        assertEquals(AUDIT_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldGetAuditForUser() = runTest {
-        lockOperations.getAuditForUser(DEFAULT_USER_ID, 0, 0)
+        val response = LockOperationsResourceImpl.getAuditForUser(DEFAULT_USER_ID, 0, 0)
+        assertEquals(AUDIT_RESPONSE, response)
     }
 
     @Test
     fun shouldGetAuditForUserJson() = runTest {
-        lockOperations.getAuditForUserJson(GetAuditForUserData(DEFAULT_USER_ID, 0, 0).toJson())
+        val response = LockOperationsResourceImpl.getAuditForUserJson(GetAuditForUserData(DEFAULT_USER_ID, 0, 0).toJson())
+        assertEquals(AUDIT_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldGetUsersForLock() = runTest {
-        lockOperations.getUsersForLock(DEFAULT_LOCK_ID)
+        val response = LockOperationsResourceImpl.getUsersForLock(DEFAULT_LOCK_ID)
+        assertEquals(USER_LOCK_RESPONSE, response)
     }
 
     @Test
     fun shouldGetUsersForLockJson() = runTest {
-        lockOperations.getUsersForLockJson(GetUsersForLockData(DEFAULT_LOCK_ID).toJson())
+        val response = LockOperationsResourceImpl.getUsersForLockJson(GetUsersForLockData(DEFAULT_LOCK_ID).toJson())
+        assertEquals(USER_LOCK_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldGetLocksForUser() = runTest {
-        lockOperations.getLocksForUser(DEFAULT_USER_ID)
+        val response = LockOperationsResourceImpl.getLocksForUser(DEFAULT_USER_ID)
+        assertEquals(LOCK_USER_RESPONSE, response)
     }
 
     @Test
     fun shouldGetLocksForUserJson() = runTest {
-        lockOperations.getLocksForUserJson(GetLocksForUserData(DEFAULT_USER_ID).toJson())
+        val response = LockOperationsResourceImpl.getLocksForUserJson(GetLocksForUserData(DEFAULT_USER_ID).toJson())
+        assertEquals(LOCK_USER_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldUpdateLockName() = runTest {
-        lockOperations.updateLockName(DEFAULT_LOCK_ID, "")
+        LockOperationsResourceImpl.updateLockName(DEFAULT_LOCK_ID, "")
     }
 
     @Test
     fun shouldUpdateLockNameJson() = runTest {
-        lockOperations.updateLockNameJson(UpdateLockNameData(DEFAULT_LOCK_ID, "").toJson())
+        LockOperationsResourceImpl.updateLockNameJson(UpdateLockNameData(DEFAULT_LOCK_ID, "").toJson())
     }
 
     @Test
     fun shouldUpdateLockFavourite() = runTest {
-        lockOperations.updateLockFavourite(DEFAULT_LOCK_ID, false)
+        LockOperationsResourceImpl.updateLockFavourite(DEFAULT_LOCK_ID, false)
     }
 
     @Test
     fun shouldUpdateLockFavouriteJson() = runTest {
-        lockOperations.updateLockFavouriteJson(UpdateLockFavouriteData(DEFAULT_LOCK_ID, false).toJson())
+        LockOperationsResourceImpl.updateLockFavouriteJson(UpdateLockFavouriteData(DEFAULT_LOCK_ID, false).toJson())
     }
 
     @Test
     fun shouldUpdateLockColour() = runTest {
-        lockOperations.updateLockColour(DEFAULT_LOCK_ID, "")
+        LockOperationsResourceImpl.updateLockColour(DEFAULT_LOCK_ID, "")
     }
 
     @Test
     fun shouldUpdateLockColourJson() = runTest {
-        lockOperations.updateLockColourJson(UpdateLockColourData(DEFAULT_LOCK_ID, "").toJson())
+        LockOperationsResourceImpl.updateLockColourJson(UpdateLockColourData(DEFAULT_LOCK_ID, "").toJson())
     }
 
     @Test
     fun shouldUpdateLockSettingDefaultName() = runTest {
-        lockOperations.updateLockSettingDefaultName(DEFAULT_LOCK_ID, "")
+        LockOperationsResourceImpl.updateLockSettingDefaultName(DEFAULT_LOCK_ID, "")
     }
 
     @Test
     fun shouldUpdateLockSettingDefaultNameJson() = runTest {
-        lockOperations.updateLockSettingDefaultNameJson(UpdateLockSettingDefaultNameData(DEFAULT_LOCK_ID, "").toJson())
+        LockOperationsResourceImpl.updateLockSettingDefaultNameJson(UpdateLockSettingDefaultNameData(DEFAULT_LOCK_ID, "").toJson())
     }
 
     @Test
     fun shouldSetLockSettingPermittedAddresses() = runTest {
-        lockOperations.setLockSettingPermittedAddresses(DEFAULT_LOCK_ID, listOf("1.1.1.1"))
+        LockOperationsResourceImpl.setLockSettingPermittedAddresses(DEFAULT_LOCK_ID, listOf("1.1.1.1"))
     }
 
     @Test
     fun shouldSetLockSettingPermittedAddressesJson() = runTest {
-        lockOperations.setLockSettingPermittedAddressesJson(SetLockSettingPermittedAddressesData(DEFAULT_LOCK_ID, listOf("1.1.1.1")).toJson())
+        LockOperationsResourceImpl.setLockSettingPermittedAddressesJson(SetLockSettingPermittedAddressesData(DEFAULT_LOCK_ID, listOf("1.1.1.1")).toJson())
     }
 
     @Test
     fun shouldUpdateLockSettingHidden() = runTest {
-        lockOperations.updateLockSettingHidden(DEFAULT_LOCK_ID, true)
+        LockOperationsResourceImpl.updateLockSettingHidden(DEFAULT_LOCK_ID, true)
     }
 
     @Test
     fun shouldUpdateLockSettingHiddenJson() = runTest {
-        lockOperations.updateLockSettingHiddenJson(UpdateLockSettingHiddenData(DEFAULT_LOCK_ID, true).toJson())
+        LockOperationsResourceImpl.updateLockSettingHiddenJson(UpdateLockSettingHiddenData(DEFAULT_LOCK_ID, true).toJson())
     }
 
     @Test
     fun shouldSetLockSettingTimeRestrictions() = runTest {
-        lockOperations.setLockSettingTimeRestrictions(DEFAULT_LOCK_ID, emptyList())
+        LockOperationsResourceImpl.setLockSettingTimeRestrictions(DEFAULT_LOCK_ID, emptyList())
     }
 
     @Test
     fun shouldSetLockSettingTimeRestrictionsJson() = runTest {
-        lockOperations.setLockSettingTimeRestrictionsJson(SetLockSettingTimeRestrictionsData(DEFAULT_LOCK_ID, emptyList()).toJson())
+        LockOperationsResourceImpl.setLockSettingTimeRestrictionsJson(SetLockSettingTimeRestrictionsData(DEFAULT_LOCK_ID, emptyList()).toJson())
     }
 
     @Test
     fun shouldUpdateLockSettingLocationRestrictions() = runTest {
-        lockOperations.updateLockSettingLocationRestrictions(DEFAULT_LOCK_ID, null)
+        LockOperationsResourceImpl.updateLockSettingLocationRestrictions(DEFAULT_LOCK_ID, null)
     }
 
     @Test
     fun shouldUpdateLockSettingLocationRestrictionsJson() = runTest {
-        lockOperations.updateLockSettingLocationRestrictionsJson(UpdateLockSettingLocationRestrictionsData(DEFAULT_LOCK_ID, null).toJson())
+        LockOperationsResourceImpl.updateLockSettingLocationRestrictionsJson(UpdateLockSettingLocationRestrictionsData(DEFAULT_LOCK_ID, null).toJson())
     }
 
     @Test
     fun shouldGetUserPublicKey() = runTest {
-        lockOperations.getUserPublicKey(DEFAULT_USER_EMAIL)
+        val response = LockOperationsResourceImpl.getUserPublicKey(DEFAULT_USER_EMAIL)
+        assertEquals(USER_PUBLIC_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldGetUserPublicKeyJson() = runTest {
-        lockOperations.getUserPublicKeyJson(GetUserPublicKeyData(DEFAULT_USER_EMAIL).toJson())
+        val response = LockOperationsResourceImpl.getUserPublicKeyJson(GetUserPublicKeyData(DEFAULT_USER_EMAIL).toJson())
+        assertEquals(USER_PUBLIC_KEY_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByEmail() = runTest {
-        lockOperations.getUserPublicKeyByEmail("")
+        val response = LockOperationsResourceImpl.getUserPublicKeyByEmail("")
+        assertEquals(USER_PUBLIC_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByEmailJson() = runTest {
-        lockOperations.getUserPublicKeyByEmailJson(GetUserPublicKeyByEmailData("").toJson())
+        val response = LockOperationsResourceImpl.getUserPublicKeyByEmailJson(GetUserPublicKeyByEmailData("").toJson())
+        assertEquals(USER_PUBLIC_KEY_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByTelephone() = runTest {
-        lockOperations.getUserPublicKeyByTelephone("")
+        val response = LockOperationsResourceImpl.getUserPublicKeyByTelephone("")
+        assertEquals(USER_PUBLIC_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByTelephoneJson() = runTest {
-        lockOperations.getUserPublicKeyByTelephoneJson(GetUserPublicKeyByTelephoneData("").toJson())
+        val response = LockOperationsResourceImpl.getUserPublicKeyByTelephoneJson(GetUserPublicKeyByTelephoneData("").toJson())
+        assertEquals(USER_PUBLIC_KEY_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByLocalKey() = runTest {
-        lockOperations.getUserPublicKeyByLocalKey("")
+        val response = LockOperationsResourceImpl.getUserPublicKeyByLocalKey("")
+        assertEquals(USER_PUBLIC_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByLocalKeyJson() = runTest {
-        lockOperations.getUserPublicKeyByLocalKeyJson(GetUserPublicKeyByLocalKeyData("").toJson())
+        val response = LockOperationsResourceImpl.getUserPublicKeyByLocalKeyJson(GetUserPublicKeyByLocalKeyData("").toJson())
+        assertEquals(USER_PUBLIC_KEY_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByForeignKey() = runTest {
-        lockOperations.getUserPublicKeyByForeignKey("")
+        val response = LockOperationsResourceImpl.getUserPublicKeyByForeignKey("")
+        assertEquals(USER_PUBLIC_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByForeignKeyJson() = runTest {
-        lockOperations.getUserPublicKeyByForeignKeyJson(GetUserPublicKeyByForeignKeyData("").toJson())
+        val response = LockOperationsResourceImpl.getUserPublicKeyByForeignKeyJson(GetUserPublicKeyByForeignKeyData("").toJson())
+        assertEquals(USER_PUBLIC_KEY_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByIdentity() = runTest {
-        lockOperations.getUserPublicKeyByIdentity("")
+        val response = LockOperationsResourceImpl.getUserPublicKeyByIdentity("")
+        assertEquals(USER_PUBLIC_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByIdentityJson() = runTest {
-        lockOperations.getUserPublicKeyByIdentityJson(GetUserPublicKeyByIdentityData("").toJson())
+        val response = LockOperationsResourceImpl.getUserPublicKeyByIdentityJson(GetUserPublicKeyByIdentityData("").toJson())
+        assertEquals(USER_PUBLIC_KEY_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByEmails() = runTest {
-        lockOperations.getUserPublicKeyByEmails(listOf("", ""))
+        val response = LockOperationsResourceImpl.getUserPublicKeyByEmails(listOf("", ""))
+        assertEquals(BATCH_USER_PUBLIC_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByEmailsJson() = runTest {
-        lockOperations.getUserPublicKeyByEmailsJson(GetUserPublicKeyByEmailsData(listOf("", "")).toJson())
+        val response = LockOperationsResourceImpl.getUserPublicKeyByEmailsJson(GetUserPublicKeyByEmailsData(listOf("", "")).toJson())
+        assertEquals(BATCH_USER_PUBLIC_KEY_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByTelephones() = runTest {
-        lockOperations.getUserPublicKeyByTelephones(listOf("", ""))
+        val response = LockOperationsResourceImpl.getUserPublicKeyByTelephones(listOf("", ""))
+        assertEquals(BATCH_USER_PUBLIC_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByTelephonesJson() = runTest {
-        lockOperations.getUserPublicKeyByTelephonesJson(GetUserPublicKeyByTelephonesData(listOf("", "")).toJson())
+        val response = LockOperationsResourceImpl.getUserPublicKeyByTelephonesJson(GetUserPublicKeyByTelephonesData(listOf("", "")).toJson())
+        assertEquals(BATCH_USER_PUBLIC_KEY_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByLocalKeys() = runTest {
-        lockOperations.getUserPublicKeyByLocalKeys(listOf("", ""))
+        val response = LockOperationsResourceImpl.getUserPublicKeyByLocalKeys(listOf("", ""))
+        assertEquals(BATCH_USER_PUBLIC_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByLocalKeysJson() = runTest {
-        lockOperations.getUserPublicKeyByLocalKeysJson(GetUserPublicKeyByLocalKeysData(listOf("", "")).toJson())
+        val response = LockOperationsResourceImpl.getUserPublicKeyByLocalKeysJson(GetUserPublicKeyByLocalKeysData(listOf("", "")).toJson())
+        assertEquals(BATCH_USER_PUBLIC_KEY_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByForeignKeys() = runTest {
-        lockOperations.getUserPublicKeyByForeignKeys(listOf("", ""))
+        val response = LockOperationsResourceImpl.getUserPublicKeyByForeignKeys(listOf("", ""))
+        assertEquals(BATCH_USER_PUBLIC_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldGetUserPublicKeyByForeignKeysJson() = runTest {
-        lockOperations.getUserPublicKeyByForeignKeysJson(GetUserPublicKeyByForeignKeysData(listOf("", "")).toJson())
+        val response = LockOperationsResourceImpl.getUserPublicKeyByForeignKeysJson(GetUserPublicKeyByForeignKeysData(listOf("", "")).toJson())
+        assertEquals(BATCH_USER_PUBLIC_KEY_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldUnlockUsingContext() = runTest {
-        lockOperations.unlock(LockOperations.UnlockOperation(LockOperations.BaseOperation(lockId = DEFAULT_LOCK_ID)))
+        LockOperationsResourceImpl.unlock(LockOperations.UnlockOperation(LockOperations.BaseOperation(lockId = DEFAULT_LOCK_ID)))
     }
 
     @Test
     fun shouldUnlockUsingContextJson() = runTest {
-        lockOperations.unlockJson(UnlockOperationData(BaseOperationData(lockId = DEFAULT_LOCK_ID)).toJson())
+        LockOperationsResourceImpl.unlockJson(UnlockOperationData(BaseOperationData(lockId = DEFAULT_LOCK_ID)).toJson())
     }
 
     @Test
     fun shouldUnlock() = runTest {
-        lockOperations.unlock(LockOperations.UnlockOperation(LockOperations.BaseOperation("userId", emptyList(), TEST_MAIN_USER_PRIVATE_KEY.decodeBase64ToByteArray(), DEFAULT_LOCK_ID)))
+        LockOperationsResourceImpl.unlock(LockOperations.UnlockOperation(LockOperations.BaseOperation("userId", emptyList(), TEST_MAIN_USER_PRIVATE_KEY.decodeBase64ToByteArray(), DEFAULT_LOCK_ID)))
     }
 
     @Test
     fun shouldUnlockJson() = runTest {
-        lockOperations.unlockJson(UnlockOperationData(BaseOperationData("userId", emptyList(), TEST_MAIN_USER_PRIVATE_KEY, DEFAULT_LOCK_ID, 0, 0, 0, "")).toJson())
+        LockOperationsResourceImpl.unlockJson(UnlockOperationData(BaseOperationData("userId", emptyList(), TEST_MAIN_USER_PRIVATE_KEY, DEFAULT_LOCK_ID, 0, 0, 0, "")).toJson())
     }
 
     @Test
     fun shouldShareLockUsingContext() = runTest {
-        lockOperations.shareLock(
+        LockOperationsResourceImpl.shareLock(
             LockOperations.ShareLockOperation(
                 baseOperation = LockOperations.BaseOperation(lockId = DEFAULT_LOCK_ID),
                 shareLock = LockOperations.ShareLock("", UserRole.USER, byteArrayOf())
@@ -321,15 +351,34 @@ class LockOperationsResourceImplTest {
 
     @Test
     fun shouldShareLockUsingContextJson() = runTest {
-        lockOperations.shareLockJson(ShareLockOperationData(
+        LockOperationsResourceImpl.shareLockJson(ShareLockOperationData(
             baseOperation = BaseOperationData(lockId = DEFAULT_LOCK_ID),
             shareLock = ShareLockData("", UserRole.USER, byteArrayOf().encodeByteArrayToBase64())
         ).toJson())
     }
 
     @Test
+    fun shouldBatchShareLockUsingContext() = runTest {
+        CapabilityCache.put(DEFAULT_LOCK_ID, mapOf(CapabilityType.BATCH_SHARING_25 to CapabilityStatus.SUPPORTED))
+        LockOperationsResourceImpl.batchShareLock(
+            LockOperations.BatchShareLockOperation(
+                baseOperation = LockOperations.BaseOperation(lockId = DEFAULT_LOCK_ID),
+                users = listOf(LockOperations.ShareLock("", UserRole.USER, byteArrayOf()))
+            ))
+    }
+
+    @Test
+    fun shouldBatchShareLockUsingContextJson() = runTest {
+        CapabilityCache.put(DEFAULT_LOCK_ID, mapOf(CapabilityType.BATCH_SHARING_25 to CapabilityStatus.SUPPORTED))
+        LockOperationsResourceImpl.batchShareLockJson(BatchShareLockOperationData(
+            baseOperation = BaseOperationData(lockId = DEFAULT_LOCK_ID),
+            users = listOf(ShareLockData("", UserRole.USER, byteArrayOf().encodeByteArrayToBase64()))
+        ).toJson())
+    }
+
+    @Test
     fun shouldShareLock() = runTest {
-        lockOperations.shareLock(
+        LockOperationsResourceImpl.shareLock(
             LockOperations.ShareLockOperation(
                 baseOperation = LockOperations.BaseOperation("", emptyList(), TEST_MAIN_USER_PRIVATE_KEY.decodeBase64ToByteArray(), DEFAULT_LOCK_ID),
                 shareLock = LockOperations.ShareLock("", UserRole.USER, byteArrayOf())
@@ -338,15 +387,34 @@ class LockOperationsResourceImplTest {
 
     @Test
     fun shouldShareLockJson() = runTest {
-        lockOperations.shareLockJson(ShareLockOperationData(
+        LockOperationsResourceImpl.shareLockJson(ShareLockOperationData(
             baseOperation = BaseOperationData("", emptyList(), TEST_MAIN_USER_PRIVATE_KEY, DEFAULT_LOCK_ID, 0, 0, 0, ""),
             shareLock = ShareLockData("", UserRole.USER, byteArrayOf().encodeByteArrayToBase64())
         ).toJson())
     }
 
     @Test
+    fun shouldBatchShareLock() = runTest {
+        CapabilityCache.put(DEFAULT_LOCK_ID, mapOf(CapabilityType.BATCH_SHARING_25 to CapabilityStatus.SUPPORTED))
+        LockOperationsResourceImpl.batchShareLock(
+            LockOperations.BatchShareLockOperation(
+                baseOperation = LockOperations.BaseOperation("", emptyList(), TEST_MAIN_USER_PRIVATE_KEY.decodeBase64ToByteArray(), DEFAULT_LOCK_ID),
+                users = listOf(LockOperations.ShareLock("", UserRole.USER, byteArrayOf()))
+            ))
+    }
+
+    @Test
+    fun shouldBatchShareLockJson() = runTest {
+        CapabilityCache.put(DEFAULT_LOCK_ID, mapOf(CapabilityType.BATCH_SHARING_25 to CapabilityStatus.SUPPORTED))
+        LockOperationsResourceImpl.batchShareLockJson(BatchShareLockOperationData(
+            baseOperation = BaseOperationData("", emptyList(), TEST_MAIN_USER_PRIVATE_KEY, DEFAULT_LOCK_ID, 0, 0, 0, ""),
+            users = listOf(ShareLockData("", UserRole.USER, byteArrayOf().encodeByteArrayToBase64()))
+        ).toJson())
+    }
+
+    @Test
     fun shouldRevokeAccessToLockUsingContext() = runTest {
-        lockOperations.revokeAccessToLock(LockOperations.RevokeAccessToLockOperation(
+        LockOperationsResourceImpl.revokeAccessToLock(LockOperations.RevokeAccessToLockOperation(
             baseOperation = LockOperations.BaseOperation(lockId = DEFAULT_LOCK_ID),
             users = emptyList()
         ))
@@ -354,7 +422,7 @@ class LockOperationsResourceImplTest {
 
     @Test
     fun shouldRevokeAccessToLockUsingContextJson() = runTest {
-        lockOperations.revokeAccessToLockJson(RevokeAccessToLockOperationData(
+        LockOperationsResourceImpl.revokeAccessToLockJson(RevokeAccessToLockOperationData(
             baseOperation = BaseOperationData(lockId = DEFAULT_LOCK_ID),
             users = emptyList()
         ).toJson())
@@ -362,7 +430,7 @@ class LockOperationsResourceImplTest {
 
     @Test
     fun shouldRevokeAccessToLock() = runTest {
-        lockOperations.revokeAccessToLock(LockOperations.RevokeAccessToLockOperation(
+        LockOperationsResourceImpl.revokeAccessToLock(LockOperations.RevokeAccessToLockOperation(
             baseOperation = LockOperations.BaseOperation("", emptyList(), TEST_MAIN_USER_PRIVATE_KEY.decodeBase64ToByteArray(), DEFAULT_LOCK_ID),
             users = emptyList()
         ))
@@ -370,7 +438,7 @@ class LockOperationsResourceImplTest {
 
     @Test
     fun shouldRevokeAccessToLockJson() = runTest {
-        lockOperations.revokeAccessToLockJson(RevokeAccessToLockOperationData(
+        LockOperationsResourceImpl.revokeAccessToLockJson(RevokeAccessToLockOperationData(
             baseOperation = BaseOperationData("", emptyList(), TEST_MAIN_USER_PRIVATE_KEY, DEFAULT_LOCK_ID, 0, 0, 0, ""),
             users = emptyList()
         ).toJson())
@@ -378,7 +446,7 @@ class LockOperationsResourceImplTest {
 
     @Test
     fun shouldUpdateSecureSettingUnlockDurationUsingContext() = runTest {
-        lockOperations.updateSecureSettingUnlockDuration(
+        LockOperationsResourceImpl.updateSecureSettingUnlockDuration(
             LockOperations.UpdateSecureSettingUnlockDuration(
                 baseOperation = LockOperations.BaseOperation(lockId = DEFAULT_LOCK_ID),
                 unlockDuration = 0
@@ -387,7 +455,7 @@ class LockOperationsResourceImplTest {
 
     @Test
     fun shouldUpdateSecureSettingUnlockDurationUsingContextJson() = runTest {
-        lockOperations.updateSecureSettingUnlockDurationJson(UpdateSecureSettingUnlockDurationData(
+        LockOperationsResourceImpl.updateSecureSettingUnlockDurationJson(UpdateSecureSettingUnlockDurationData(
             baseOperation = BaseOperationData(lockId = DEFAULT_LOCK_ID),
             unlockDuration = 0
         ).toJson())
@@ -395,7 +463,7 @@ class LockOperationsResourceImplTest {
 
     @Test
     fun shouldUpdateSecureSettingUnlockDuration() = runTest {
-        lockOperations.updateSecureSettingUnlockDuration(
+        LockOperationsResourceImpl.updateSecureSettingUnlockDuration(
             LockOperations.UpdateSecureSettingUnlockDuration(
             baseOperation = LockOperations.BaseOperation("", emptyList(), TEST_MAIN_USER_PRIVATE_KEY.decodeBase64ToByteArray(), DEFAULT_LOCK_ID),
             unlockDuration = 0
@@ -404,7 +472,7 @@ class LockOperationsResourceImplTest {
 
     @Test
     fun shouldUpdateSecureSettingUnlockDurationJson() = runTest {
-        lockOperations.updateSecureSettingUnlockDurationJson(UpdateSecureSettingUnlockDurationData(
+        LockOperationsResourceImpl.updateSecureSettingUnlockDurationJson(UpdateSecureSettingUnlockDurationData(
             baseOperation = BaseOperationData("", emptyList(), TEST_MAIN_USER_PRIVATE_KEY, DEFAULT_LOCK_ID, 0, 0 , 0, ""),
             unlockDuration = 0
         ).toJson())
@@ -412,7 +480,7 @@ class LockOperationsResourceImplTest {
 
     @Test
     fun shouldUpdateSecureSettingUnlockBetweenUsingContext() = runTest {
-        lockOperations.updateSecureSettingUnlockBetween(
+        LockOperationsResourceImpl.updateSecureSettingUnlockBetween(
             LockOperations.UpdateSecureSettingUnlockBetween(
                 baseOperation = LockOperations.BaseOperation(lockId = DEFAULT_LOCK_ID),
                 unlockBetween = null
@@ -421,7 +489,7 @@ class LockOperationsResourceImplTest {
 
     @Test
     fun shouldUpdateSecureSettingUnlockBetweenUsingContextJson() = runTest {
-        lockOperations.updateSecureSettingUnlockBetweenJson(UpdateSecureSettingUnlockBetweenData(
+        LockOperationsResourceImpl.updateSecureSettingUnlockBetweenJson(UpdateSecureSettingUnlockBetweenData(
             baseOperation = BaseOperationData(lockId = DEFAULT_LOCK_ID),
             unlockBetween = null
         ).toJson())
@@ -429,7 +497,7 @@ class LockOperationsResourceImplTest {
 
     @Test
     fun shouldUpdateSecureSettingUnlockBetween() = runTest {
-        lockOperations.updateSecureSettingUnlockBetween(
+        LockOperationsResourceImpl.updateSecureSettingUnlockBetween(
             LockOperations.UpdateSecureSettingUnlockBetween(
             baseOperation = LockOperations.BaseOperation("", emptyList(), TEST_MAIN_USER_PRIVATE_KEY.decodeBase64ToByteArray(), DEFAULT_LOCK_ID),
             unlockBetween = null
@@ -438,7 +506,7 @@ class LockOperationsResourceImplTest {
 
     @Test
     fun shouldUpdateSecureSettingUnlockBetweenJson() = runTest {
-        lockOperations.updateSecureSettingUnlockBetweenJson(UpdateSecureSettingUnlockBetweenData(
+        LockOperationsResourceImpl.updateSecureSettingUnlockBetweenJson(UpdateSecureSettingUnlockBetweenData(
             baseOperation = BaseOperationData("", emptyList(), TEST_MAIN_USER_PRIVATE_KEY, DEFAULT_LOCK_ID, 0, 0, 0, ""),
             unlockBetween = null
         ).toJson())
@@ -446,21 +514,25 @@ class LockOperationsResourceImplTest {
 
     @Test
     fun shouldGetPinnedLocks() = runTest {
-        lockOperations.getPinnedLocks()
+        val response = LockOperationsResourceImpl.getPinnedLocks()
+        assertEquals(PINNED_LOCKS_RESPONSE, response)
     }
 
     @Test
     fun shouldGetPinnedLocksJson() = runTest {
-        lockOperations.getPinnedLocksJson()
+        val response = LockOperationsResourceImpl.getPinnedLocksJson()
+        assertEquals(PINNED_LOCKS_RESPONSE.toResultDataJson(), response)
     }
 
     @Test
     fun shouldGetShareableLocks() = runTest {
-        lockOperations.getShareableLocks()
+        val response = LockOperationsResourceImpl.getShareableLocks()
+        assertEquals(SHAREABLE_LOCKS_RESPONSE, response)
     }
 
     @Test
     fun shouldGetShareableLocksJson() = runTest {
-        lockOperations.getShareableLocksJson()
+        val response = LockOperationsResourceImpl.getShareableLocksJson()
+        assertEquals(SHAREABLE_LOCKS_RESPONSE.toResultDataJson(), response)
     }
 }

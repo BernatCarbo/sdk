@@ -2,6 +2,8 @@ package com.doordeck.multiplatform.sdk.internal
 
 import com.doordeck.multiplatform.sdk.ApplicationContext
 import com.doordeck.multiplatform.sdk.api.ContextManager
+import com.doordeck.multiplatform.sdk.cache.CapabilityCache
+import com.doordeck.multiplatform.sdk.api.model.ApiEnvironment
 import com.doordeck.multiplatform.sdk.api.model.Context
 import com.doordeck.multiplatform.sdk.api.model.Crypto
 import com.doordeck.multiplatform.sdk.crypto.CryptoManager
@@ -11,17 +13,16 @@ import com.doordeck.multiplatform.sdk.storage.SecureStorage
 import com.doordeck.multiplatform.sdk.storage.createSecureStorage
 import com.doordeck.multiplatform.sdk.util.JwtUtils.isJwtTokenAboutToExpire
 import com.doordeck.multiplatform.sdk.util.Utils.decodeBase64ToByteArray
+import com.doordeck.multiplatform.sdk.util.Utils.stringToCertificateChain
 import com.doordeck.multiplatform.sdk.util.fromJson
 import kotlin.uuid.Uuid
 
-internal class ContextManagerImpl(
-    private val applicationContext: ApplicationContext? = null,
-    token: String? = null,
-    refreshToken: String? = null
-): ContextManager {
+internal object ContextManagerImpl : ContextManager {
 
-    private var currentToken: String? = token
-    private var currentRefreshToken: String? = refreshToken
+    private var apiEnvironment: ApiEnvironment = ApiEnvironment.PROD
+    private var applicationContext: ApplicationContext? = null
+    private var currentToken: String? = null
+    private var currentRefreshToken: String? = null
     private var currentFusionToken: String? = null
     private var currentUserId: String? = null
     private var currentEmail: String? = null
@@ -29,6 +30,18 @@ internal class ContextManagerImpl(
     private var currentUserPublicKey: ByteArray? = null
     private var currentUserPrivateKey: ByteArray? = null
     private var secureStorage: SecureStorage? = null
+
+    override fun setApiEnvironment(apiEnvironment: ApiEnvironment) {
+        this.apiEnvironment = apiEnvironment
+    }
+
+    override fun getApiEnvironment(): ApiEnvironment {
+        return apiEnvironment
+    }
+
+    override fun setApplicationContext(applicationContext: ApplicationContext) {
+        this.applicationContext = applicationContext
+    }
 
     override fun setAuthToken(token: String) {
         currentToken = token
@@ -133,6 +146,7 @@ internal class ContextManagerImpl(
         resetTokens()
         resetOperationContext()
         currentEmail = null
+        CapabilityCache.reset()
     }
 
     private fun resetTokens() {
@@ -158,7 +172,7 @@ internal class ContextManagerImpl(
     override fun setOperationContextJson(data: String) {
         val operationContextData = data.fromJson<Context.OperationContextData>()
         currentUserId = operationContextData.userId
-        currentUserCertificateChain = operationContextData.userCertificateChain
+        currentUserCertificateChain = operationContextData.userCertificateChain.stringToCertificateChain()
         currentUserPublicKey = operationContextData.userPublicKey.decodeBase64ToByteArray()
         currentUserPrivateKey = operationContextData.userPrivateKey.decodeBase64ToByteArray()
     }

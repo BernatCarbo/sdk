@@ -1,9 +1,7 @@
 package com.doordeck.multiplatform.sdk.api
 
 import com.doordeck.multiplatform.sdk.api.responses.TokenResponse
-import com.doordeck.multiplatform.sdk.internal.api.AccountlessClient
 import com.doordeck.multiplatform.sdk.internal.api.AccountlessResourceImpl
-import org.koin.mp.KoinPlatform.getKoin
 import java.util.concurrent.CompletableFuture
 
 actual interface AccountlessResource {
@@ -21,9 +19,9 @@ actual interface AccountlessResource {
      *
      * @see <a href="https://developer.doordeck.com/docs/#registration-v3">API Doc</a>
      */
-    suspend fun registration(email: String, password: String, displayName: String? = null, force: Boolean = false): TokenResponse
+    suspend fun registration(email: String, password: String, displayName: String? = null, force: Boolean = false, publicKey: ByteArray? = null): TokenResponse
 
-    fun registrationAsync(email: String, password: String, displayName: String? = null, force: Boolean = false): CompletableFuture<TokenResponse>
+    fun registrationAsync(email: String, password: String, displayName: String? = null, force: Boolean = false, publicKey: ByteArray? = null): CompletableFuture<TokenResponse>
 
     /**
      * Verify email
@@ -33,6 +31,20 @@ actual interface AccountlessResource {
     suspend fun verifyEmail(code: String)
 
     fun verifyEmailAsync(code: String): CompletableFuture<Unit>
+
+    /**
+     * Password reset
+     */
+    suspend fun passwordReset(email: String)
+
+    fun passwordResetAsync(email: String): CompletableFuture<Unit>
+
+    /**
+     * Password reset verify
+     */
+    suspend fun passwordResetVerify(userId: String, token: String, password: String)
+
+    fun passwordResetVerifyAsync(userId: String, token: String, password: String): CompletableFuture<Unit>
 }
 
-actual fun accountless(): AccountlessResource = AccountlessResourceImpl(getKoin().get<AccountlessClient>())
+actual fun accountless(): AccountlessResource = AccountlessResourceImpl

@@ -9,9 +9,7 @@ import com.doordeck.multiplatform.sdk.api.responses.ShareableLockResponse
 import com.doordeck.multiplatform.sdk.api.responses.UserLockResponse
 import com.doordeck.multiplatform.sdk.api.responses.UserPublicKeyResponse
 import com.doordeck.multiplatform.sdk.internal.api.DoordeckOnly
-import com.doordeck.multiplatform.sdk.internal.api.LockOperationsClient
 import com.doordeck.multiplatform.sdk.internal.api.LockOperationsResourceImpl
-import org.koin.mp.KoinPlatform.getKoin
 
 actual interface LockOperationsResource {
     /**
@@ -216,6 +214,14 @@ actual interface LockOperationsResource {
     suspend fun shareLock(shareLockOperation: LockOperations.ShareLockOperation)
 
     /**
+     * Batch share a lock
+     *
+     * @see <a href="https://developer.doordeck.com/docs/#batch-share-a-lock-v2">API Doc</a>
+     */
+    @Throws(Exception::class)
+    suspend fun batchShareLock(batchShareLockOperation: LockOperations.BatchShareLockOperation)
+
+    /**
      * Revoke access to a lock
      *
      * @see <a href="https://developer.doordeck.com/docs/#revoke-access-to-a-lock">API Doc</a>
@@ -256,4 +262,4 @@ actual interface LockOperationsResource {
     suspend fun getShareableLocks(): List<ShareableLockResponse>
 }
 
-actual fun lockOperations(): LockOperationsResource = LockOperationsResourceImpl(getKoin().get<LockOperationsClient>())
+actual fun lockOperations(): LockOperationsResource = LockOperationsResourceImpl

@@ -1,163 +1,175 @@
 package com.doordeck.multiplatform.sdk.api
 
-import com.doordeck.multiplatform.sdk.TEST_HTTP_CLIENT
+import com.doordeck.multiplatform.sdk.MockTest
+import com.doordeck.multiplatform.sdk.REGISTER_EPHEMERAL_KEY_RESPONSE
+import com.doordeck.multiplatform.sdk.REGISTER_EPHEMERAL_KEY_WITH_SECONDARY_AUTHENTICATION_RESPONSE
+import com.doordeck.multiplatform.sdk.TOKEN_RESPONSE
 import com.doordeck.multiplatform.sdk.TestConstants.TEST_MAIN_USER_PRIVATE_KEY
-import com.doordeck.multiplatform.sdk.TestConstants.TEST_MAIN_USER_PUBLIC_KEY
-import com.doordeck.multiplatform.sdk.internal.ContextManagerImpl
-import com.doordeck.multiplatform.sdk.internal.api.AccountClient
+import com.doordeck.multiplatform.sdk.USER_DETAILS_RESPONSE
 import com.doordeck.multiplatform.sdk.internal.api.AccountResourceImpl
 import com.doordeck.multiplatform.sdk.util.Utils.decodeBase64ToByteArray
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
-class AccountResourceImplTest {
-
-    private val contextManager = ContextManagerImpl()
-    private val account = AccountResourceImpl(AccountClient(TEST_HTTP_CLIENT, contextManager))
-
-    init {
-        contextManager.setKeyPair(TEST_MAIN_USER_PUBLIC_KEY.decodeBase64ToByteArray(), TEST_MAIN_USER_PRIVATE_KEY.decodeBase64ToByteArray())
-        contextManager.setRefreshToken("")
-    }
+class AccountResourceImplTest : MockTest() {
 
     @Test
     fun shouldRefreshToken() = runTest {
-        account.refreshToken("")
+        val response = AccountResourceImpl.refreshToken("")
+        assertEquals(TOKEN_RESPONSE, response)
     }
 
     @Test
     fun shouldRefreshTokenAsync() = runTest {
-        account.refreshTokenAsync("").await()
+        val response = AccountResourceImpl.refreshTokenAsync("").await()
+        assertEquals(TOKEN_RESPONSE, response)
     }
 
     @Test
     fun shouldRefreshTokenUsingContext() = runTest {
-        account.refreshToken()
+        val response = AccountResourceImpl.refreshToken()
+        assertEquals(TOKEN_RESPONSE, response)
     }
 
     @Test
     fun shouldRefreshTokenUsingContextAsync() = runTest {
-        account.refreshTokenAsync().await()
+        val response = AccountResourceImpl.refreshTokenAsync().await()
+        assertEquals(TOKEN_RESPONSE, response)
     }
 
     @Test
     fun shouldLogout() = runTest {
-        account.logout()
+        AccountResourceImpl.logout()
     }
 
     @Test
     fun shouldLogoutAsync() = runTest {
-        account.logoutAsync().await()
+        AccountResourceImpl.logoutAsync().await()
     }
 
     @Test
     fun shouldRegisterEphemeralKey() = runTest {
-        account.registerEphemeralKey(byteArrayOf())
+        val response = AccountResourceImpl.registerEphemeralKey(byteArrayOf())
+        assertEquals(REGISTER_EPHEMERAL_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldRegisterEphemeralKeyAsync() = runTest {
-        account.registerEphemeralKeyAsync(byteArrayOf()).await()
+        val response = AccountResourceImpl.registerEphemeralKeyAsync(byteArrayOf()).await()
+        assertEquals(REGISTER_EPHEMERAL_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldRegisterEphemeralKeyUsingContext() = runTest {
-        account.registerEphemeralKey()
+        val response = AccountResourceImpl.registerEphemeralKey()
+        assertEquals(REGISTER_EPHEMERAL_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldRegisterEphemeralKeyUsingContextAsync() = runTest {
-        account.registerEphemeralKeyAsync().await()
+        val response = AccountResourceImpl.registerEphemeralKeyAsync().await()
+        assertEquals(REGISTER_EPHEMERAL_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldRegisterEphemeralKeyWithSecondaryAuthentication() = runTest {
-        account.registerEphemeralKeyWithSecondaryAuthentication(byteArrayOf())
+        val response = AccountResourceImpl.registerEphemeralKeyWithSecondaryAuthentication(byteArrayOf())
+        assertEquals(REGISTER_EPHEMERAL_KEY_WITH_SECONDARY_AUTHENTICATION_RESPONSE, response)
     }
 
     @Test
     fun shouldRegisterEphemeralKeyWithSecondaryAuthenticationAsync() = runTest {
-        account.registerEphemeralKeyWithSecondaryAuthenticationAsync(byteArrayOf()).await()
+        val response = AccountResourceImpl.registerEphemeralKeyWithSecondaryAuthenticationAsync(byteArrayOf()).await()
+        assertEquals(REGISTER_EPHEMERAL_KEY_WITH_SECONDARY_AUTHENTICATION_RESPONSE, response)
     }
 
     @Test
     fun shouldRegisterEphemeralKeyWithSecondaryAuthenticationUsingContext() = runTest {
-        account.registerEphemeralKeyWithSecondaryAuthentication()
+        val response = AccountResourceImpl.registerEphemeralKeyWithSecondaryAuthentication()
+        assertEquals(REGISTER_EPHEMERAL_KEY_WITH_SECONDARY_AUTHENTICATION_RESPONSE, response)
     }
 
     @Test
     fun shouldRegisterEphemeralKeyWithSecondaryAuthenticationUsingContextAsync() = runTest {
-        account.registerEphemeralKeyWithSecondaryAuthenticationAsync().await()
+        val response = AccountResourceImpl.registerEphemeralKeyWithSecondaryAuthenticationAsync().await()
+        assertEquals(REGISTER_EPHEMERAL_KEY_WITH_SECONDARY_AUTHENTICATION_RESPONSE, response)
     }
 
     @Test
     fun shouldVerifyEphemeralKeyRegistration() = runTest {
-        account.verifyEphemeralKeyRegistration("", TEST_MAIN_USER_PRIVATE_KEY.decodeBase64ToByteArray())
+        val response = AccountResourceImpl.verifyEphemeralKeyRegistration("", TEST_MAIN_USER_PRIVATE_KEY.decodeBase64ToByteArray())
+        assertEquals(REGISTER_EPHEMERAL_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldVerifyEphemeralKeyRegistrationAsync() = runTest {
-        account.verifyEphemeralKeyRegistrationAsync("", TEST_MAIN_USER_PRIVATE_KEY.decodeBase64ToByteArray()).await()
+        val response = AccountResourceImpl.verifyEphemeralKeyRegistrationAsync("", TEST_MAIN_USER_PRIVATE_KEY.decodeBase64ToByteArray()).await()
+        assertEquals(REGISTER_EPHEMERAL_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldVerifyEphemeralKeyRegistrationUsingContext() = runTest {
-        account.verifyEphemeralKeyRegistration("")
+        val response = AccountResourceImpl.verifyEphemeralKeyRegistration("")
+        assertEquals(REGISTER_EPHEMERAL_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldVerifyEphemeralKeyRegistrationUsingContextAsync() = runTest {
-        account.verifyEphemeralKeyRegistrationAsync("").await()
+        val response = AccountResourceImpl.verifyEphemeralKeyRegistrationAsync("").await()
+        assertEquals(REGISTER_EPHEMERAL_KEY_RESPONSE, response)
     }
 
     @Test
     fun shouldReverifyEmail() = runTest {
-        account.reverifyEmail()
+        AccountResourceImpl.reverifyEmail()
     }
 
     @Test
     fun shouldReverifyEmailAsync() = runTest {
-        account.reverifyEmailAsync().await()
+        AccountResourceImpl.reverifyEmailAsync().await()
     }
 
     @Test
     fun shouldChangePassword() = runTest {
-        account.changePassword("", "")
+        AccountResourceImpl.changePassword("", "")
     }
 
     @Test
     fun shouldChangePasswordAsync() = runTest {
-        account.changePasswordAsync("", "").await()
+        AccountResourceImpl.changePasswordAsync("", "").await()
     }
 
     @Test
     fun shouldGetUserDetails() = runTest {
-        account.getUserDetails()
+        val response = AccountResourceImpl.getUserDetails()
+        assertEquals(USER_DETAILS_RESPONSE, response)
     }
 
     @Test
     fun shouldGetUserDetailsAsync() = runTest {
-        account.getUserDetailsAsync().await()
+        val response = AccountResourceImpl.getUserDetailsAsync().await()
+        assertEquals(USER_DETAILS_RESPONSE, response)
     }
 
     @Test
     fun shouldUpdateUserDetails() = runTest {
-        account.updateUserDetails("")
+        AccountResourceImpl.updateUserDetails("")
     }
 
     @Test
     fun shouldUpdateUserDetailsAsync() = runTest {
-        account.updateUserDetailsAsync("").await()
+        AccountResourceImpl.updateUserDetailsAsync("").await()
     }
 
     @Test
     fun shouldDeleteAccount() = runTest {
-        account.deleteAccount()
+        AccountResourceImpl.deleteAccount()
     }
 
     @Test
     fun shouldDeleteAccountAsync() = runTest {
-        account.deleteAccountAsync().await()
+        AccountResourceImpl.deleteAccountAsync().await()
     }
 }

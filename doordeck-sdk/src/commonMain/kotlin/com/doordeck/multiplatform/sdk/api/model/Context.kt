@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 object Context {
 
     @Serializable
-    class OperationContextData(
+    data class OperationContextData(
         val userId: String,
-        val userCertificateChain: List<String>,
+        val userCertificateChain: String,
         val userPublicKey: String,
         val userPrivateKey: String
     )

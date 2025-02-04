@@ -5,10 +5,8 @@ import com.doordeck.multiplatform.sdk.api.responses.RegisterEphemeralKeyResponse
 import com.doordeck.multiplatform.sdk.api.responses.RegisterEphemeralKeyWithSecondaryAuthenticationResponse
 import com.doordeck.multiplatform.sdk.api.responses.TokenResponse
 import com.doordeck.multiplatform.sdk.api.responses.UserDetailsResponse
-import com.doordeck.multiplatform.sdk.internal.api.AccountClient
 import com.doordeck.multiplatform.sdk.internal.api.AccountResourceImpl
 import com.doordeck.multiplatform.sdk.internal.api.DoordeckOnly
-import org.koin.mp.KoinPlatform.getKoin
 
 actual interface AccountResource {
     /**
@@ -18,7 +16,9 @@ actual interface AccountResource {
      */
     @DoordeckOnly
     fun refreshToken(refreshToken: String? = null): TokenResponse
+
     @DoordeckOnly
+    @CName("refreshTokenJson")
     fun refreshTokenJson(data: String? = null): String
 
     /**
@@ -28,12 +28,17 @@ actual interface AccountResource {
      */
     fun logout()
 
+    @CName("logoutJson")
+    fun logoutJson(): String
+
     /**
      * Register ephemeral key
      *
      * @see <a href="https://developer.doordeck.com/docs/#register-ephemeral-key">API Doc</a>
      */
     fun registerEphemeralKey(publicKey: ByteArray? = null): RegisterEphemeralKeyResponse
+
+    @CName("registerEphemeralKeyJson")
     fun registerEphemeralKeyJson(data: String? = null): String
 
     /**
@@ -42,6 +47,8 @@ actual interface AccountResource {
      * @see <a href="https://developer.doordeck.com/docs/#register-ephemeral-key-with-secondary-authentication">API Doc</a>
      */
     fun registerEphemeralKeyWithSecondaryAuthentication(publicKey: ByteArray? = null, method: TwoFactorMethod? = null): RegisterEphemeralKeyWithSecondaryAuthenticationResponse
+
+    @CName("registerEphemeralKeyWithSecondaryAuthenticationJson")
     fun registerEphemeralKeyWithSecondaryAuthenticationJson(data: String? = null): String
 
     /**
@@ -50,6 +57,8 @@ actual interface AccountResource {
      * @see <a href="https://developer.doordeck.com/docs/#verify-ephemeral-key-registration">API Doc</a>
      */
     fun verifyEphemeralKeyRegistration(code: String, privateKey: ByteArray? = null): RegisterEphemeralKeyResponse
+
+    @CName("verifyEphemeralKeyRegistrationJson")
     fun verifyEphemeralKeyRegistrationJson(data: String): String
 
     /**
@@ -60,6 +69,10 @@ actual interface AccountResource {
     @DoordeckOnly
     fun reverifyEmail()
 
+    @DoordeckOnly
+    @CName("reverifyEmailJson")
+    fun reverifyEmailJson(): String
+
     /**
      * Change password
      *
@@ -67,8 +80,10 @@ actual interface AccountResource {
      */
     @DoordeckOnly
     fun changePassword(oldPassword: String, newPassword: String)
+
     @DoordeckOnly
-    fun changePasswordJson(data: String)
+    @CName("changePasswordJson")
+    fun changePasswordJson(data: String): String
 
     /**
      * Get user details
@@ -76,6 +91,8 @@ actual interface AccountResource {
      * @see <a href="https://developer.doordeck.com/docs/#get-user-details">API Doc</a>
      */
     fun getUserDetails(): UserDetailsResponse
+
+    @CName("getUserDetailsJson")
     fun getUserDetailsJson(): String
 
     /**
@@ -84,7 +101,9 @@ actual interface AccountResource {
      * @see <a href="https://developer.doordeck.com/docs/#update-user-details">API Doc</a>
      */
     fun updateUserDetails(displayName: String)
-    fun updateUserDetailsJson(data: String)
+
+    @CName("updateUserDetailsJson")
+    fun updateUserDetailsJson(data: String): String
 
     /**
      * Delete account
@@ -92,6 +111,9 @@ actual interface AccountResource {
      * @see <a href="https://developer.doordeck.com/docs/#delete-account">API Doc</a>
      */
     fun deleteAccount()
+
+    @CName("deleteAccountJson")
+    fun deleteAccountJson(): String
 }
 
-actual fun account(): AccountResource = AccountResourceImpl(getKoin().get<AccountClient>())
+actual fun account(): AccountResource = AccountResourceImpl

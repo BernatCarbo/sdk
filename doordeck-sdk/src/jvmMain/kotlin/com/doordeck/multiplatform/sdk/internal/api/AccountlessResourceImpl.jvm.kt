@@ -2,36 +2,48 @@ package com.doordeck.multiplatform.sdk.internal.api
 
 import com.doordeck.multiplatform.sdk.api.AccountlessResource
 import com.doordeck.multiplatform.sdk.api.responses.TokenResponse
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.future.future
+import com.doordeck.multiplatform.sdk.util.completableFuture
 import java.util.concurrent.CompletableFuture
 
-internal class AccountlessResourceImpl(
-    private val accountlessClient: AccountlessClient
-) : AccountlessResource {
+internal object AccountlessResourceImpl : AccountlessResource {
 
     override suspend fun login(email: String, password: String): TokenResponse {
-        return accountlessClient.loginRequest(email, password)
+        return AccountlessClient.loginRequest(email, password)
     }
 
     override fun loginAsync(email: String, password: String): CompletableFuture<TokenResponse> {
-        return GlobalScope.future(Dispatchers.IO) { accountlessClient.loginRequest(email, password) }
+        return completableFuture { login(email, password) }
     }
 
-    override suspend fun registration(email: String, password: String, displayName: String?, force: Boolean): TokenResponse {
-        return accountlessClient.registrationRequest(email, password, displayName, force)
+    override suspend fun registration(email: String, password: String, displayName: String?, force: Boolean, publicKey: ByteArray?): TokenResponse {
+        return AccountlessClient.registrationRequest(email, password, displayName, force, publicKey)
     }
 
-    override fun registrationAsync(email: String, password: String, displayName: String?, force: Boolean): CompletableFuture<TokenResponse> {
-        return GlobalScope.future(Dispatchers.IO) { accountlessClient.registrationRequest(email, password, displayName, force) }
+    override fun registrationAsync(email: String, password: String, displayName: String?, force: Boolean, publicKey: ByteArray?): CompletableFuture<TokenResponse> {
+        return completableFuture { registration(email, password, displayName, force, publicKey) }
     }
 
     override suspend fun verifyEmail(code: String) {
-        return accountlessClient.verifyEmailRequest(code)
+        return AccountlessClient.verifyEmailRequest(code)
     }
 
     override fun verifyEmailAsync(code: String): CompletableFuture<Unit> {
-        return GlobalScope.future(Dispatchers.IO) { accountlessClient.verifyEmailRequest(code) }
+        return completableFuture { verifyEmail(code) }
+    }
+
+    override suspend fun passwordReset(email: String) {
+        return AccountlessClient.passwordResetRequest(email)
+    }
+
+    override fun passwordResetAsync(email: String): CompletableFuture<Unit> {
+        return completableFuture { passwordReset(email) }
+    }
+
+    override suspend fun passwordResetVerify(userId: String, token: String, password: String) {
+        return AccountlessClient.passwordResetVerifyRequest(userId, token, password)
+    }
+
+    override fun passwordResetVerifyAsync(userId: String, token: String, password: String): CompletableFuture<Unit> {
+        return completableFuture { passwordResetVerify(userId, token, password) }
     }
 }

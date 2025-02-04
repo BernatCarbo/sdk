@@ -5,6 +5,12 @@ import kotlin.js.JsExport
 
 @JsExport
 @Serializable
-class AssistedLoginResponse(
+data class AssistedLoginResponse(
+    val requiresVerification: Boolean
+)
+
+@JsExport
+@Serializable
+data class AssistedRegisterEphemeralKeyResponse(
     val requiresVerification: Boolean
 )

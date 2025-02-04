@@ -1,6 +1,7 @@
 package com.doordeck.multiplatform.sdk.internal.api
 
 import com.doordeck.multiplatform.sdk.api.LockOperationsResource
+import com.doordeck.multiplatform.sdk.api.model.BatchShareLockOperationData
 import com.doordeck.multiplatform.sdk.api.model.GetAuditForUserData
 import com.doordeck.multiplatform.sdk.api.model.GetLockAuditTrailData
 import com.doordeck.multiplatform.sdk.api.model.GetLocksForUserData
@@ -30,6 +31,7 @@ import com.doordeck.multiplatform.sdk.api.model.UpdateLockSettingHiddenData
 import com.doordeck.multiplatform.sdk.api.model.UpdateLockSettingLocationRestrictionsData
 import com.doordeck.multiplatform.sdk.api.model.UpdateSecureSettingUnlockBetweenData
 import com.doordeck.multiplatform.sdk.api.model.UpdateSecureSettingUnlockDurationData
+import com.doordeck.multiplatform.sdk.api.model.toBatchShareLockOperation
 import com.doordeck.multiplatform.sdk.api.model.toLocationRequirement
 import com.doordeck.multiplatform.sdk.api.model.toRevokeAccessToLockOperation
 import com.doordeck.multiplatform.sdk.api.model.toShareLockOperation
@@ -45,278 +47,347 @@ import com.doordeck.multiplatform.sdk.api.responses.ShareableLockResponse
 import com.doordeck.multiplatform.sdk.api.responses.UserLockResponse
 import com.doordeck.multiplatform.sdk.api.responses.UserPublicKeyResponse
 import com.doordeck.multiplatform.sdk.util.fromJson
-import com.doordeck.multiplatform.sdk.util.toJson
+import com.doordeck.multiplatform.sdk.util.resultData
 import kotlinx.coroutines.runBlocking
 
-internal class LockOperationsResourceImpl(
-    private val lockOperationsClient: LockOperationsClient
-) : LockOperationsResource {
+internal object LockOperationsResourceImpl : LockOperationsResource {
 
     override fun getSingleLock(lockId: String): LockResponse {
-        return runBlocking { lockOperationsClient.getSingleLockRequest(lockId) }
+        return runBlocking { LockOperationsClient.getSingleLockRequest(lockId) }
     }
 
     override fun getSingleLockJson(data: String): String {
-        val getSingleLockData = data.fromJson<GetSingleLockData>()
-        return getSingleLock(getSingleLockData.lockId).toJson()
+        return resultData {
+            val getSingleLockData = data.fromJson<GetSingleLockData>()
+            getSingleLock(getSingleLockData.lockId)
+        }
     }
 
     override fun getLockAuditTrail(lockId: String, start: Int, end: Int): List<AuditResponse> {
-        return runBlocking { lockOperationsClient.getLockAuditTrailRequest(lockId, start, end) }
+        return runBlocking { LockOperationsClient.getLockAuditTrailRequest(lockId, start, end) }
     }
 
     override fun getLockAuditTrailJson(data: String): String {
-        val getLockAuditTrailData = data.fromJson<GetLockAuditTrailData>()
-        return getLockAuditTrail(getLockAuditTrailData.lockId, getLockAuditTrailData.start, getLockAuditTrailData.end).toJson()
+        return resultData {
+            val getLockAuditTrailData = data.fromJson<GetLockAuditTrailData>()
+            getLockAuditTrail(getLockAuditTrailData.lockId, getLockAuditTrailData.start, getLockAuditTrailData.end)
+        }
     }
 
     override fun getAuditForUser(userId: String, start: Int, end: Int): List<AuditResponse> {
-        return runBlocking { lockOperationsClient.getAuditForUserRequest(userId, start, end) }
+        return runBlocking { LockOperationsClient.getAuditForUserRequest(userId, start, end) }
     }
 
     override fun getAuditForUserJson(data: String): String {
-        val getAuditForUserData = data.fromJson<GetAuditForUserData>()
-        return getAuditForUser(getAuditForUserData.userId, getAuditForUserData.start, getAuditForUserData.end).toJson()
+        return resultData {
+            val getAuditForUserData = data.fromJson<GetAuditForUserData>()
+            getAuditForUser(getAuditForUserData.userId, getAuditForUserData.start, getAuditForUserData.end)
+        }
     }
 
     override fun getUsersForLock(lockId: String): List<UserLockResponse> {
-        return runBlocking { lockOperationsClient.getUsersForLockRequest(lockId) }
+        return runBlocking { LockOperationsClient.getUsersForLockRequest(lockId) }
     }
 
     override fun getUsersForLockJson(data: String): String {
-        val getUsersForLockData = data.fromJson<GetUsersForLockData>()
-        return getUsersForLock(getUsersForLockData.lockId).toJson()
+        return resultData {
+            val getUsersForLockData = data.fromJson<GetUsersForLockData>()
+            getUsersForLock(getUsersForLockData.lockId)
+        }
     }
 
     override fun getLocksForUser(userId: String): LockUserResponse {
-        return runBlocking { lockOperationsClient.getLocksForUserRequest(userId) }
+        return runBlocking { LockOperationsClient.getLocksForUserRequest(userId) }
     }
 
     override fun getLocksForUserJson(data: String): String {
-        val getLocksForUserData = data.fromJson<GetLocksForUserData>()
-        return getLocksForUser(getLocksForUserData.userId).toJson()
+        return resultData {
+            val getLocksForUserData = data.fromJson<GetLocksForUserData>()
+            getLocksForUser(getLocksForUserData.userId)
+        }
     }
 
     override fun updateLockName(lockId: String, name: String?) {
-        return runBlocking { lockOperationsClient.updateLockNameRequest(lockId, name) }
+        return runBlocking { LockOperationsClient.updateLockNameRequest(lockId, name) }
     }
 
-    override fun updateLockNameJson(data: String) {
-        val updateLockNameData = data.fromJson<UpdateLockNameData>()
-        return updateLockName(updateLockNameData.lockId, updateLockNameData.name)
+    override fun updateLockNameJson(data: String): String {
+        return resultData {
+            val updateLockNameData = data.fromJson<UpdateLockNameData>()
+            updateLockName(updateLockNameData.lockId, updateLockNameData.name)
+        }
     }
 
     override fun updateLockFavourite(lockId: String, favourite: Boolean?) {
-        return runBlocking { lockOperationsClient.updateLockFavouriteRequest(lockId, favourite) }
+        return runBlocking { LockOperationsClient.updateLockFavouriteRequest(lockId, favourite) }
     }
 
-    override fun updateLockFavouriteJson(data: String) {
-        val updateLockFavouriteData = data.fromJson<UpdateLockFavouriteData>()
-        return updateLockFavourite(updateLockFavouriteData.lockId, updateLockFavouriteData.favourite)
+    override fun updateLockFavouriteJson(data: String): String {
+        return resultData {
+            val updateLockFavouriteData = data.fromJson<UpdateLockFavouriteData>()
+            updateLockFavourite(updateLockFavouriteData.lockId, updateLockFavouriteData.favourite)
+        }
     }
 
     override fun updateLockColour(lockId: String, colour: String?) {
-        return runBlocking { lockOperationsClient.updateLockColourRequest(lockId, colour) }
+        return runBlocking { LockOperationsClient.updateLockColourRequest(lockId, colour) }
     }
 
-    override fun updateLockColourJson(data: String) {
-        val updateLockColourData = data.fromJson<UpdateLockColourData>()
-        return updateLockColour(updateLockColourData.lockId, updateLockColourData.colour)
+    override fun updateLockColourJson(data: String): String {
+        return resultData {
+            val updateLockColourData = data.fromJson<UpdateLockColourData>()
+            updateLockColour(updateLockColourData.lockId, updateLockColourData.colour)
+        }
     }
 
     override fun updateLockSettingDefaultName(lockId: String, name: String?) {
-        return runBlocking { lockOperationsClient.updateLockSettingDefaultNameRequest(lockId, name) }
+        return runBlocking { LockOperationsClient.updateLockSettingDefaultNameRequest(lockId, name) }
     }
 
-    override fun updateLockSettingDefaultNameJson(data: String) {
-        val updateLockSettingDefaultNameData = data.fromJson<UpdateLockSettingDefaultNameData>()
-        return updateLockSettingDefaultName(updateLockSettingDefaultNameData.lockId, updateLockSettingDefaultNameData.name)
+    override fun updateLockSettingDefaultNameJson(data: String): String {
+        return resultData {
+            val updateLockSettingDefaultNameData = data.fromJson<UpdateLockSettingDefaultNameData>()
+            updateLockSettingDefaultName(updateLockSettingDefaultNameData.lockId, updateLockSettingDefaultNameData.name)
+        }
     }
 
     override fun setLockSettingPermittedAddresses(lockId: String, permittedAddresses: List<String>) {
-        return runBlocking { lockOperationsClient.setLockSettingPermittedAddressesRequest(lockId, permittedAddresses) }
+        return runBlocking { LockOperationsClient.setLockSettingPermittedAddressesRequest(lockId, permittedAddresses) }
     }
 
-    override fun setLockSettingPermittedAddressesJson(data: String) {
-        val setLockSettingPermittedAddressesData = data.fromJson<SetLockSettingPermittedAddressesData>()
-        return setLockSettingPermittedAddresses(setLockSettingPermittedAddressesData.lockId, setLockSettingPermittedAddressesData.permittedAddresses)
+    override fun setLockSettingPermittedAddressesJson(data: String): String {
+        return resultData {
+            val setLockSettingPermittedAddressesData = data.fromJson<SetLockSettingPermittedAddressesData>()
+            setLockSettingPermittedAddresses(setLockSettingPermittedAddressesData.lockId, setLockSettingPermittedAddressesData.permittedAddresses)
+        }
     }
 
     override fun updateLockSettingHidden(lockId: String, hidden: Boolean) {
-        return runBlocking { lockOperationsClient.updateLockSettingHiddenRequest(lockId, hidden) }
+        return runBlocking { LockOperationsClient.updateLockSettingHiddenRequest(lockId, hidden) }
     }
 
-    override fun updateLockSettingHiddenJson(data: String) {
-        val updateLockSettingHiddenData = data.fromJson<UpdateLockSettingHiddenData>()
-        return updateLockSettingHidden(updateLockSettingHiddenData.lockId, updateLockSettingHiddenData.hidden)
+    override fun updateLockSettingHiddenJson(data: String): String {
+        return resultData {
+            val updateLockSettingHiddenData = data.fromJson<UpdateLockSettingHiddenData>()
+            updateLockSettingHidden(updateLockSettingHiddenData.lockId, updateLockSettingHiddenData.hidden)
+        }
     }
 
     override fun setLockSettingTimeRestrictions(lockId: String, times: List<LockOperations.TimeRequirement>) {
-        return runBlocking { lockOperationsClient.setLockSettingTimeRestrictionsRequest(lockId, times) }
+        return runBlocking { LockOperationsClient.setLockSettingTimeRestrictionsRequest(lockId, times) }
     }
 
-    override fun setLockSettingTimeRestrictionsJson(data: String) {
-        val setLockSettingTimeRestrictionsData = data.fromJson<SetLockSettingTimeRestrictionsData>()
-        return setLockSettingTimeRestrictions(setLockSettingTimeRestrictionsData.lockId, setLockSettingTimeRestrictionsData.times.toTimeRequirementList())
+    override fun setLockSettingTimeRestrictionsJson(data: String): String {
+        return resultData {
+            val setLockSettingTimeRestrictionsData = data.fromJson<SetLockSettingTimeRestrictionsData>()
+            setLockSettingTimeRestrictions(setLockSettingTimeRestrictionsData.lockId, setLockSettingTimeRestrictionsData.times.toTimeRequirementList())
+        }
     }
 
     override fun updateLockSettingLocationRestrictions(lockId: String, location: LockOperations.LocationRequirement?) {
-        return runBlocking { lockOperationsClient.updateLockSettingLocationRestrictionsRequest(lockId, location) }
+        return runBlocking { LockOperationsClient.updateLockSettingLocationRestrictionsRequest(lockId, location) }
     }
 
-    override fun updateLockSettingLocationRestrictionsJson(data: String) {
-        val updateLockSettingLocationRestrictionsData = data.fromJson<UpdateLockSettingLocationRestrictionsData>()
-        return updateLockSettingLocationRestrictions(updateLockSettingLocationRestrictionsData.lockId, updateLockSettingLocationRestrictionsData.location?.toLocationRequirement())
+    override fun updateLockSettingLocationRestrictionsJson(data: String): String {
+        return resultData {
+            val updateLockSettingLocationRestrictionsData = data.fromJson<UpdateLockSettingLocationRestrictionsData>()
+            updateLockSettingLocationRestrictions(updateLockSettingLocationRestrictionsData.lockId, updateLockSettingLocationRestrictionsData.location?.toLocationRequirement())
+        }
     }
 
     override fun getUserPublicKey(userEmail: String, visitor: Boolean): UserPublicKeyResponse {
-        return runBlocking { lockOperationsClient.getUserPublicKeyRequest(userEmail, visitor) }
+        return runBlocking { LockOperationsClient.getUserPublicKeyRequest(userEmail, visitor) }
     }
 
     override fun getUserPublicKeyJson(data: String): String {
-        val getUserPublicKeyData = data.fromJson<GetUserPublicKeyData>()
-        return getUserPublicKey(getUserPublicKeyData.userEmail, getUserPublicKeyData.visitor).toJson()
+        return resultData {
+            val getUserPublicKeyData = data.fromJson<GetUserPublicKeyData>()
+            getUserPublicKey(getUserPublicKeyData.userEmail, getUserPublicKeyData.visitor)
+        }
     }
 
     override fun getUserPublicKeyByEmail(email: String): UserPublicKeyResponse {
-        return runBlocking { lockOperationsClient.getUserPublicKeyByEmailRequest(email) }
+        return runBlocking { LockOperationsClient.getUserPublicKeyByEmailRequest(email) }
     }
 
     override fun getUserPublicKeyByEmailJson(data: String): String {
-        val getUserPublicKeyData = data.fromJson<GetUserPublicKeyByEmailData>()
-        return getUserPublicKeyByEmail(getUserPublicKeyData.email).toJson()
+        return resultData {
+            val getUserPublicKeyData = data.fromJson<GetUserPublicKeyByEmailData>()
+            getUserPublicKeyByEmail(getUserPublicKeyData.email)
+        }
     }
 
     override fun getUserPublicKeyByTelephone(telephone: String): UserPublicKeyResponse {
-        return runBlocking { lockOperationsClient.getUserPublicKeyByTelephoneRequest(telephone) }
+        return runBlocking { LockOperationsClient.getUserPublicKeyByTelephoneRequest(telephone) }
     }
 
     override fun getUserPublicKeyByTelephoneJson(data: String): String {
-        val getUserPublicKeyByTelephoneData = data.fromJson<GetUserPublicKeyByTelephoneData>()
-        return getUserPublicKeyByTelephone(getUserPublicKeyByTelephoneData.telephone).toJson()
+        return resultData {
+            val getUserPublicKeyByTelephoneData = data.fromJson<GetUserPublicKeyByTelephoneData>()
+            getUserPublicKeyByTelephone(getUserPublicKeyByTelephoneData.telephone)
+        }
     }
 
     override fun getUserPublicKeyByLocalKey(localKey: String): UserPublicKeyResponse {
-        return runBlocking { lockOperationsClient.getUserPublicKeyByLocalKeyRequest(localKey) }
+        return runBlocking { LockOperationsClient.getUserPublicKeyByLocalKeyRequest(localKey) }
     }
 
     override fun getUserPublicKeyByLocalKeyJson(data: String): String {
-        val getUserPublicKeyByLocalKeyData = data.fromJson<GetUserPublicKeyByLocalKeyData>()
-        return getUserPublicKeyByLocalKey(getUserPublicKeyByLocalKeyData.localKey).toJson()
+        return resultData {
+            val getUserPublicKeyByLocalKeyData = data.fromJson<GetUserPublicKeyByLocalKeyData>()
+            getUserPublicKeyByLocalKey(getUserPublicKeyByLocalKeyData.localKey)
+        }
     }
 
     override fun getUserPublicKeyByForeignKey(foreignKey: String): UserPublicKeyResponse {
-        return runBlocking { lockOperationsClient.getUserPublicKeyByForeignKeyRequest(foreignKey) }
+        return runBlocking { LockOperationsClient.getUserPublicKeyByForeignKeyRequest(foreignKey) }
     }
 
     override fun getUserPublicKeyByForeignKeyJson(data: String): String {
-        val getUserPublicKeyByForeignKeyData = data.fromJson<GetUserPublicKeyByForeignKeyData>()
-        return getUserPublicKeyByForeignKey(getUserPublicKeyByForeignKeyData.foreignKey).toJson()
+        return resultData {
+            val getUserPublicKeyByForeignKeyData = data.fromJson<GetUserPublicKeyByForeignKeyData>()
+            getUserPublicKeyByForeignKey(getUserPublicKeyByForeignKeyData.foreignKey)
+        }
     }
 
     override fun getUserPublicKeyByIdentity(identity: String): UserPublicKeyResponse {
-        return runBlocking { lockOperationsClient.getUserPublicKeyByIdentityRequest(identity) }
+        return runBlocking { LockOperationsClient.getUserPublicKeyByIdentityRequest(identity) }
     }
 
     override fun getUserPublicKeyByIdentityJson(data: String): String {
-        val getUserPublicKeyByIdentityData = data.fromJson<GetUserPublicKeyByIdentityData>()
-        return getUserPublicKeyByIdentity(getUserPublicKeyByIdentityData.identity).toJson()
+        return resultData {
+            val getUserPublicKeyByIdentityData = data.fromJson<GetUserPublicKeyByIdentityData>()
+            getUserPublicKeyByIdentity(getUserPublicKeyByIdentityData.identity)
+        }
     }
 
     override fun getUserPublicKeyByEmails(emails: List<String>): List<BatchUserPublicKeyResponse> {
-        return runBlocking { lockOperationsClient.getUserPublicKeyByEmailsRequest(emails) }
+        return runBlocking { LockOperationsClient.getUserPublicKeyByEmailsRequest(emails) }
     }
 
     override fun getUserPublicKeyByEmailsJson(data: String): String {
-        val getUserPublicKeyByEmailsData = data.fromJson<GetUserPublicKeyByEmailsData>()
-        return getUserPublicKeyByEmails(getUserPublicKeyByEmailsData.emails).toJson()
+        return resultData {
+            val getUserPublicKeyByEmailsData = data.fromJson<GetUserPublicKeyByEmailsData>()
+            getUserPublicKeyByEmails(getUserPublicKeyByEmailsData.emails)
+        }
     }
 
     override fun getUserPublicKeyByTelephones(telephones: List<String>): List<BatchUserPublicKeyResponse> {
-        return runBlocking { lockOperationsClient.getUserPublicKeyByTelephonesRequest(telephones) }
+        return runBlocking { LockOperationsClient.getUserPublicKeyByTelephonesRequest(telephones) }
     }
 
     override fun getUserPublicKeyByTelephonesJson(data: String): String {
-        val getUserPublicKeyByTelephonesData = data.fromJson<GetUserPublicKeyByTelephonesData>()
-        return getUserPublicKeyByTelephones(getUserPublicKeyByTelephonesData.telephones).toJson()
+        return resultData {
+            val getUserPublicKeyByTelephonesData = data.fromJson<GetUserPublicKeyByTelephonesData>()
+            getUserPublicKeyByTelephones(getUserPublicKeyByTelephonesData.telephones)
+        }
     }
 
     override fun getUserPublicKeyByLocalKeys(localKeys: List<String>): List<BatchUserPublicKeyResponse> {
-        return runBlocking { lockOperationsClient.getUserPublicKeyByLocalKeysRequest(localKeys) }
+        return runBlocking { LockOperationsClient.getUserPublicKeyByLocalKeysRequest(localKeys) }
     }
 
     override fun getUserPublicKeyByLocalKeysJson(data: String): String {
-        val getUserPublicKeyByLocalKeysData = data.fromJson<GetUserPublicKeyByLocalKeysData>()
-        return getUserPublicKeyByLocalKeys(getUserPublicKeyByLocalKeysData.localKeys).toJson()
+        return resultData {
+            val getUserPublicKeyByLocalKeysData = data.fromJson<GetUserPublicKeyByLocalKeysData>()
+            getUserPublicKeyByLocalKeys(getUserPublicKeyByLocalKeysData.localKeys)
+        }
     }
 
     override fun getUserPublicKeyByForeignKeys(foreignKeys: List<String>): List<BatchUserPublicKeyResponse> {
-        return runBlocking { lockOperationsClient.getUserPublicKeyByForeignKeysRequest(foreignKeys) }
+        return runBlocking { LockOperationsClient.getUserPublicKeyByForeignKeysRequest(foreignKeys) }
     }
 
     override fun getUserPublicKeyByForeignKeysJson(data: String): String {
-        val getUserPublicKeyByForeignKeysData = data.fromJson<GetUserPublicKeyByForeignKeysData>()
-        return getUserPublicKeyByForeignKeys(getUserPublicKeyByForeignKeysData.foreignKeys).toJson()
+        return resultData {
+            val getUserPublicKeyByForeignKeysData = data.fromJson<GetUserPublicKeyByForeignKeysData>()
+            getUserPublicKeyByForeignKeys(getUserPublicKeyByForeignKeysData.foreignKeys)
+        }
     }
 
     override fun unlock(unlockOperation: LockOperations.UnlockOperation) {
-        return runBlocking { lockOperationsClient.unlockRequest(unlockOperation) }
+        return runBlocking { LockOperationsClient.unlockRequest(unlockOperation) }
     }
 
-    override fun unlockJson(data: String) {
-        val unlockOperationData = data.fromJson<UnlockOperationData>()
-        return unlock(unlockOperationData.toUnlockOperation())
+    override fun unlockJson(data: String): String {
+        return resultData {
+            val unlockOperationData = data.fromJson<UnlockOperationData>()
+            unlock(unlockOperationData.toUnlockOperation())
+        }
     }
 
     override fun shareLock(shareLockOperation: LockOperations.ShareLockOperation) {
-        return runBlocking { lockOperationsClient.shareLockRequest(shareLockOperation) }
+        return runBlocking { LockOperationsClient.shareLockRequest(shareLockOperation) }
     }
 
-    override fun shareLockJson(data: String) {
-        val shareLockOperationData = data.fromJson<ShareLockOperationData>()
-        return shareLock(shareLockOperationData.toShareLockOperation())
+    override fun shareLockJson(data: String): String {
+        return resultData {
+            val shareLockOperationData = data.fromJson<ShareLockOperationData>()
+            shareLock(shareLockOperationData.toShareLockOperation())
+        }
+    }
+
+    override fun batchShareLock(batchShareLockOperation: LockOperations.BatchShareLockOperation) {
+        return runBlocking { LockOperationsClient.batchShareLockRequest(batchShareLockOperation) }
+    }
+
+    override fun batchShareLockJson(data: String): String {
+        return resultData {
+            val batchShareLockOperationData = data.fromJson<BatchShareLockOperationData>()
+            batchShareLock(batchShareLockOperationData.toBatchShareLockOperation())
+        }
     }
 
     override fun revokeAccessToLock(revokeAccessToLockOperation: LockOperations.RevokeAccessToLockOperation) {
-        return runBlocking { lockOperationsClient.revokeAccessToLockRequest(revokeAccessToLockOperation) }
+        return runBlocking { LockOperationsClient.revokeAccessToLockRequest(revokeAccessToLockOperation) }
     }
 
-    override fun revokeAccessToLockJson(data: String) {
-        val revokeAccessToLockOperationData = data.fromJson<RevokeAccessToLockOperationData>()
-        return revokeAccessToLock(revokeAccessToLockOperationData.toRevokeAccessToLockOperation())
+    override fun revokeAccessToLockJson(data: String): String {
+        return resultData {
+            val revokeAccessToLockOperationData = data.fromJson<RevokeAccessToLockOperationData>()
+            revokeAccessToLock(revokeAccessToLockOperationData.toRevokeAccessToLockOperation())
+        }
     }
 
     override fun updateSecureSettingUnlockDuration(updateSecureSettingUnlockDuration: LockOperations.UpdateSecureSettingUnlockDuration) {
-        return runBlocking { lockOperationsClient.updateSecureSettingUnlockDurationRequest(updateSecureSettingUnlockDuration) }
+        return runBlocking { LockOperationsClient.updateSecureSettingUnlockDurationRequest(updateSecureSettingUnlockDuration) }
     }
 
-    override fun updateSecureSettingUnlockDurationJson(data: String) {
-        val updateSecureSettingUnlockDurationData = data.fromJson<UpdateSecureSettingUnlockDurationData>()
-        return updateSecureSettingUnlockDuration(updateSecureSettingUnlockDurationData.toUpdateSecureSettingUnlockDuration())
+    override fun updateSecureSettingUnlockDurationJson(data: String): String {
+        return resultData {
+            val updateSecureSettingUnlockDurationData = data.fromJson<UpdateSecureSettingUnlockDurationData>()
+            updateSecureSettingUnlockDuration(updateSecureSettingUnlockDurationData.toUpdateSecureSettingUnlockDuration())
+        }
     }
 
     override fun updateSecureSettingUnlockBetween(updateSecureSettingUnlockBetween: LockOperations.UpdateSecureSettingUnlockBetween) {
-        return runBlocking { lockOperationsClient.updateSecureSettingUnlockBetweenRequest(updateSecureSettingUnlockBetween) }
+        return runBlocking { LockOperationsClient.updateSecureSettingUnlockBetweenRequest(updateSecureSettingUnlockBetween) }
     }
 
-    override fun updateSecureSettingUnlockBetweenJson(data: String) {
-        val updateSecureSettingUnlockBetweenData = data.fromJson<UpdateSecureSettingUnlockBetweenData>()
-        return updateSecureSettingUnlockBetween(updateSecureSettingUnlockBetweenData.toUpdateSecureSettingUnlockBetween())
+    override fun updateSecureSettingUnlockBetweenJson(data: String): String {
+        return resultData {
+            val updateSecureSettingUnlockBetweenData = data.fromJson<UpdateSecureSettingUnlockBetweenData>()
+            updateSecureSettingUnlockBetween(updateSecureSettingUnlockBetweenData.toUpdateSecureSettingUnlockBetween())
+        }
     }
 
     override fun getPinnedLocks(): List<LockResponse> {
-        return runBlocking { lockOperationsClient.getPinnedLocksRequest() }
+        return runBlocking { LockOperationsClient.getPinnedLocksRequest() }
     }
 
     override fun getPinnedLocksJson(): String {
-        return getPinnedLocks().toJson()
+        return resultData {
+            getPinnedLocks()
+        }
     }
 
     override fun getShareableLocks(): List<ShareableLockResponse> {
-        return runBlocking { lockOperationsClient.getShareableLocksRequest() }
+        return runBlocking { LockOperationsClient.getShareableLocksRequest() }
     }
 
     override fun getShareableLocksJson(): String {
-        return getShareableLocks().toJson()
+        return resultData {
+            getShareableLocks()
+        }
     }
 }

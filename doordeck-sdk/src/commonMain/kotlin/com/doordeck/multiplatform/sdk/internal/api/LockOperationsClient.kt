@@ -1,8 +1,14 @@
 package com.doordeck.multiplatform.sdk.internal.api
 
+import com.doordeck.multiplatform.sdk.BatchShareFailedException
+import com.doordeck.multiplatform.sdk.CloudHttpClient
 import com.doordeck.multiplatform.sdk.MissingContextFieldException
+import com.doordeck.multiplatform.sdk.cache.CapabilityCache
+import com.doordeck.multiplatform.sdk.api.model.CapabilityType
 import com.doordeck.multiplatform.sdk.api.model.LockOperations
+import com.doordeck.multiplatform.sdk.api.model.withNewJti
 import com.doordeck.multiplatform.sdk.api.requests.BaseOperationRequest
+import com.doordeck.multiplatform.sdk.api.requests.BatchShareLockOperationRequest
 import com.doordeck.multiplatform.sdk.api.requests.BatchUserPublicKeyRequest
 import com.doordeck.multiplatform.sdk.api.requests.LocationRequirementRequest
 import com.doordeck.multiplatform.sdk.api.requests.LockOperationRequest
@@ -38,15 +44,10 @@ import com.doordeck.multiplatform.sdk.internal.ContextManagerImpl
 import com.doordeck.multiplatform.sdk.util.Utils.encodeByteArrayToBase64
 import com.doordeck.multiplatform.sdk.util.addRequestHeaders
 import com.doordeck.multiplatform.sdk.util.toJson
-import io.ktor.client.HttpClient
 import io.ktor.client.request.parameter
 import io.ktor.client.request.setBody
 
-internal open class LockOperationsClient(
-    private val httpClient: HttpClient,
-    private val contextManager: ContextManagerImpl,
-    private val localUnlockClient: LocalUnlockClient
-) : AbstractResourceImpl() {
+internal object LockOperationsClient : AbstractResourceImpl() {
 
     /**
      * Get a single lock
@@ -54,7 +55,7 @@ internal open class LockOperationsClient(
      * @see <a href="https://developer.doordeck.com/docs/#get-a-single-lock">API Doc</a>
      */
     suspend fun getSingleLockRequest(lockId: String): LockResponse {
-        return httpClient.get(Paths.getSingleLockPath(lockId)) {
+        return CloudHttpClient.get(Paths.getSingleLockPath(lockId)) {
             addRequestHeaders(contentType = null, apiVersion = ApiVersion.VERSION_3)
         }
     }
@@ -65,7 +66,7 @@ internal open class LockOperationsClient(
      * @see <a href="https://developer.doordeck.com/docs/#get-lock-audit-trail-v2">API Doc</a>
      */
     suspend fun getLockAuditTrailRequest(lockId: String, start: Int, end: Int): List<AuditResponse> {
-        return httpClient.get(Paths.getLockAuditTrailPath(lockId)) {
+        return CloudHttpClient.get(Paths.getLockAuditTrailPath(lockId)) {
             addRequestHeaders(contentType = null, apiVersion = ApiVersion.VERSION_2)
             parameter(Params.START, start)
             parameter(Params.END, end)
@@ -78,7 +79,7 @@ internal open class LockOperationsClient(
      * @see <a href="https://developer.doordeck.com/docs/#get-audit-for-a-user">API Doc</a>
      */
     suspend fun getAuditForUserRequest(userId: String, start: Int, end: Int): List<AuditResponse> {
-        return httpClient.get(Paths.getAuditForUserPath(userId)) {
+        return CloudHttpClient.get(Paths.getAuditForUserPath(userId)) {
             addRequestHeaders(contentType = null, apiVersion = ApiVersion.VERSION_2)
             parameter(Params.START, start)
             parameter(Params.END, end)
@@ -91,7 +92,7 @@ internal open class LockOperationsClient(
      * @see <a href="https://developer.doordeck.com/docs/#get-users-for-a-lock">API Doc</a>
      */
     suspend fun getUsersForLockRequest(lockId: String): List<UserLockResponse> {
-        return httpClient.get(Paths.getUsersForLockPath(lockId))
+        return CloudHttpClient.get(Paths.getUsersForLockPath(lockId))
     }
 
     /**
@@ -100,7 +101,7 @@ internal open class LockOperationsClient(
      * @see <a href="https://developer.doordeck.com/docs/#get-locks-for-a-user">API Doc</a>
      */
     suspend fun getLocksForUserRequest(userId: String): LockUserResponse {
-        return httpClient.get(Paths.getLocksForUserPath(userId))
+        return CloudHttpClient.get(Paths.getLocksForUserPath(userId))
     }
 
     /**
@@ -184,7 +185,7 @@ internal open class LockOperationsClient(
     }
 
     private suspend fun updateLockProperties(lockId: String, request: UpdateLockPropertiesRequest) {
-        httpClient.put<Unit>(Paths.getUpdateLockPropertiesPath(lockId)) {
+        CloudHttpClient.put<Unit>(Paths.getUpdateLockPropertiesPath(lockId)) {
             addRequestHeaders()
             setBody(request)
         }
@@ -197,7 +198,7 @@ internal open class LockOperationsClient(
      */
     @DoordeckOnly
     suspend fun getUserPublicKeyRequest(userEmail: String, visitor: Boolean): UserPublicKeyResponse {
-        return httpClient.post(Paths.getUserPublicKeyPath(userEmail)) {
+        return CloudHttpClient.post(Paths.getUserPublicKeyPath(userEmail)) {
             addRequestHeaders()
             parameter(Params.VISITOR, visitor)
         }
@@ -244,7 +245,7 @@ internal open class LockOperationsClient(
         getUserPublicKey(UserPublicKeyRequest(identity = identity))
 
     private suspend fun getUserPublicKey(request: UserPublicKeyRequest): UserPublicKeyResponse {
-        return httpClient.post(Paths.getUserPublicKeyPath()) {
+        return CloudHttpClient.post(Paths.getUserPublicKeyPath()) {
             addRequestHeaders()
             setBody(request)
         }
@@ -283,7 +284,7 @@ internal open class LockOperationsClient(
         batchGetUserPublicKey(BatchUserPublicKeyRequest(foreignKey = foreignKeys))
 
     private suspend fun batchGetUserPublicKey(request: BatchUserPublicKeyRequest): List<BatchUserPublicKeyResponse> {
-        return httpClient.post(Paths.getUserPublicKeyPath()) {
+        return CloudHttpClient.post(Paths.getUserPublicKeyPath()) {
             addRequestHeaders(apiVersion = ApiVersion.VERSION_2)
             setBody(request)
         }
@@ -314,6 +315,57 @@ internal open class LockOperationsClient(
             end = shareLockOperation.shareLock.end?.toLong()
         )
         val baseOperationRequest = shareLockOperation.baseOperation.toBaseOperationRequestUsingContext()
+        performOperation(baseOperationRequest, operationRequest)
+    }
+
+    /**
+     * Batch share a lock
+     *
+     * @see <a href="https://developer.doordeck.com/docs/#batch-share-a-lock-v2">API Doc</a>
+     */
+    suspend fun batchShareLockRequest(batchShareLockOperation: LockOperations.BatchShareLockOperation) {
+        /**
+         * Verify whether the operation device currently supports the batch sharing operation
+         */
+        val isSupported = CapabilityCache.isSupported(batchShareLockOperation.baseOperation.lockId, CapabilityType.BATCH_SHARING_25)
+            ?: getSingleLockRequest(batchShareLockOperation.baseOperation.lockId).also {
+                CapabilityCache.put(batchShareLockOperation.baseOperation.lockId, it.settings.capabilities)
+            }.settings.capabilities.containsKey(CapabilityType.BATCH_SHARING_25)
+
+        /**
+         * If the device does not support the batch sharing operation, we will call the single-user sharing operation for each user individually
+         */
+        if (!isSupported) {
+            val failedOperations = batchShareLockOperation.users.mapNotNull { shareLock ->
+                try {
+                    shareLockRequest(LockOperations.ShareLockOperation(
+                        baseOperation = batchShareLockOperation.baseOperation.withNewJti(), // Recreate the base operation because we need to use a different JTI for each user
+                        shareLock = shareLock
+                    ))
+                    null
+                } catch (exception: Exception) {
+                    shareLock
+                }
+            }
+
+            if (failedOperations.isNotEmpty()) {
+                throw BatchShareFailedException("Batch share failed", failedOperations.map { it.targetUserId })
+            }
+            return
+        }
+
+        val operationRequest = BatchShareLockOperationRequest(
+            users = batchShareLockOperation.users.map {
+                ShareLockOperationRequest(
+                    user = it.targetUserId,
+                    publicKey = it.targetUserPublicKey.encodeByteArrayToBase64(),
+                    role = it.targetUserRole,
+                    start = it.start?.toLong(),
+                    end = it.end?.toLong()
+                )
+            }
+        )
+        val baseOperationRequest = batchShareLockOperation.baseOperation.toBaseOperationRequestUsingContext()
         performOperation(baseOperationRequest, operationRequest)
     }
 
@@ -381,10 +433,10 @@ internal open class LockOperationsClient(
 
         // Launch the calls to the direct access endpoints
         if (operationRequest is LockOperationRequest && !directAccessEndpoints.isNullOrEmpty()) {
-            localUnlockClient.unlock(directAccessEndpoints, body)
+            LocalUnlockClient.unlock(directAccessEndpoints, body)
         }
 
-        httpClient.post<Unit>(Paths.getOperationPath(baseOperationRequest.lockId)) {
+        CloudHttpClient.post<Unit>(Paths.getOperationPath(baseOperationRequest.lockId)) {
             addRequestHeaders(true)
             setBody(body)
         }
@@ -396,7 +448,7 @@ internal open class LockOperationsClient(
      * @see <a href="https://developer.doordeck.com/docs/#get-pinned-locks">API Doc</a>
      */
     suspend fun getPinnedLocksRequest(): List<LockResponse> {
-        return httpClient.get(Paths.getPinnedLocksPath())
+        return CloudHttpClient.get(Paths.getPinnedLocksPath())
     }
 
     /**
@@ -405,18 +457,18 @@ internal open class LockOperationsClient(
      * @see <a href="https://developer.doordeck.com/docs/#get-shareable-locks">API Doc</a>
      */
     suspend fun getShareableLocksRequest(): List<ShareableLockResponse> {
-        return httpClient.get(Paths.getShareableLocksPath())
+        return CloudHttpClient.get(Paths.getShareableLocksPath())
     }
 
     private fun LockOperations.BaseOperation.toBaseOperationRequestUsingContext(): BaseOperationRequest {
         val userId = userId
-            ?: contextManager.getUserId()
+            ?: ContextManagerImpl.getUserId()
             ?: throw MissingContextFieldException("User ID is missing")
         val userCertificateChain = userCertificateChain
-            ?: contextManager.getCertificateChain()
+            ?: ContextManagerImpl.getCertificateChain()
             ?: throw MissingContextFieldException("Certificate chain is missing")
         val userPrivateKey = userPrivateKey
-            ?: contextManager.getPrivateKey()
+            ?: ContextManagerImpl.getPrivateKey()
             ?: throw MissingContextFieldException("Private key is missing")
         return BaseOperationRequest(
             userId = userId,
