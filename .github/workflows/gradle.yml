@@ -63,6 +63,8 @@ jobs:
 
       - name: Publish to PyPi
         run: |
+          ./gradlew pythonPack
+          
           swig -python -o doordeck-sdk/build/bin/mingwX64/releaseShared/python/doordeck_headless_sdk/doordeck_headless_sdk_wrap.py \
             doordeck-sdk/build/bin/mingwX64/releaseShared/python/doordeck_headless_sdk.i
 
