@@ -70,6 +70,4 @@ class InitializeSdk(object):
 #include "../../releaseShared/Doordeck.Headless.Sdk_api.h"
 %}
 
-%ignore Doordeck_Headless_Sdk_KVector128;
-
 %include "../../releaseShared/Doordeck.Headless.Sdk_api.h"
