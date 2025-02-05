@@ -70,11 +70,6 @@ class InitializeSdk(object):
 #include "../../releaseShared/Doordeck.Headless.Sdk_api.h"
 %}
 
-%module example  // Define the module name
-
-// Include the header with the typedef
-%include "path_to_your_header_file.h"
-
 // Custom typemap for converting between C and Python for the vector
 %typemap(in) Doordeck_Headless_Sdk_KVector128 {
     // Custom conversion from Python object to C vector
