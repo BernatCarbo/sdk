@@ -70,8 +70,13 @@ jobs:
         run: |
           ./gradlew pythonPack
           
-          swig -python -D_MSC_VER -o doordeck-sdk/build/bin/mingwX64/python/doordeck_headless_sdk/doordeck_headless_sdk_wrap.py \
+          swig -python -D_MSC_VER -o doordeck-sdk/build/bin/mingwX64/python/doordeck_headless_sdk/doordeck_headless_sdk_wrap.c \
             doordeck-sdk/build/bin/mingwX64/python/doordeck_headless_sdk/doordeck_headless_sdk.i
+          
+          gcc -shared -o doordeck-sdk/build/bin/mingwX64/python/doordeck_headless_sdk/_doordeck_headless_sdk.pyd \
+            doordeck-sdk/build/bin/mingwX64/python/doordeck_headless_sdk/doordeck_headless_sdk_wrap.c \
+            doordeck-sdk/build/bin/mingwX64/releaseShared\Doordeck.Headless.Sdk.dll \
+            -I ${{ env.Python3_ROOT_DIR }}/include -L ${{ env.Python3_ROOT_DIR }}/libs -lpython312
 
       - name: Create GitHub Release
         env:
