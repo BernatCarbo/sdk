@@ -70,8 +70,6 @@ class InitializeSdk(object):
 #include "../../releaseShared/Doordeck.Headless.Sdk_api.h"
 %}
 
-%if !defined(_MSC_VER)
-%define vector_size_macro
-%enddef
+%ignore Doordeck_Headless_Sdk_KVector128;
 
 %include "../../releaseShared/Doordeck.Headless.Sdk_api.h"
