@@ -59,17 +59,7 @@ jobs:
           sed -i '' \
             -e 's/_\$$/_/g' \
             -e 's/\$//g' \
-            -e '/#ifndef _MSC_VER/,/#endif/c\
-#ifdef SWIG\
-typedef float Doordeck_Headless_Sdk_KVector128[4];\
-#else\
-#ifndef _MSC_VER\
-typedef float __attribute__ ((__vector_size__ (16))) Doordeck_Headless_Sdk_KVector128;\
-#else\
-#include <xmmintrin.h>\
-typedef __m128 Doordeck_Headless_Sdk_KVector128;\
-#endif\
-#endif' \
+            -e '/#ifndef _MSC_VER/{:a;N;/#endif/!ba;s/#ifndef _MSC_VER.*#endif/#ifdef SWIG\ntypedef float Doordeck_Headless_Sdk_KVector128[4];\n#else\n#ifndef _MSC_VER\ntypedef float __attribute__ ((__vector_size__ (16))) Doordeck_Headless_Sdk_KVector128;\n#else\n#include <xmmintrin.h>\ntypedef __m128 Doordeck_Headless_Sdk_KVector128;\n#endif\n#endif/}' \
           "doordeck-sdk/build/bin/mingwX64/releaseShared/Doordeck.Headless.Sdk_api.h"
 
       - name: Publish to PyPi
