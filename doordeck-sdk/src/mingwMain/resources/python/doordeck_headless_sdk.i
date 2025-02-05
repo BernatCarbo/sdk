@@ -1,6 +1,7 @@
 %module doordeck_headless_sdk
 
 // Include sdk interfaces
+%ignore Doordeck_Headless_Sdk_KVector128;
 %include "imports.i"
 %include "exceptions.i"
 %include "utils/utils.i"
