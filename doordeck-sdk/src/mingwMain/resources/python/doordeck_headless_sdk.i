@@ -70,6 +70,13 @@ class InitializeSdk(object):
 #include "../../releaseShared/Doordeck.Headless.Sdk_api.h"
 %}
 
-%typedef float Doordeck_Headless_Sdk_KVector128[4];
+%typemap(in) Doordeck_Headless_Sdk_KVector128 {
+    $result = new float[4];  // allocating a new float array of size 4
+    memcpy($result, $input, 4 * sizeof(float));  // copying data from the vector to the array
+}
+
+%typemap(out) Doordeck_Headless_Sdk_KVector128 {
+    memcpy($result, $input, 4 * sizeof(float));  // copying data from the array back to the vector
+}
 
 %include "../../releaseShared/Doordeck.Headless.Sdk_api.h"
