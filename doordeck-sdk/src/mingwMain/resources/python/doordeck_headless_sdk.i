@@ -70,13 +70,36 @@ class InitializeSdk(object):
 #include "../../releaseShared/Doordeck.Headless.Sdk_api.h"
 %}
 
+%module example  // Define the module name
+
+// Include the header with the typedef
+%include "path_to_your_header_file.h"
+
+// Custom typemap for converting between C and Python for the vector
 %typemap(in) Doordeck_Headless_Sdk_KVector128 {
-    $result = new float[4];  // allocating a new float array of size 4
-    memcpy($result, $input, 4 * sizeof(float));  // copying data from the vector to the array
+    // Custom conversion from Python object to C vector
+    // Let's assume you're passing a Python list or tuple of 4 floats
+    if (PySequence_Check($input)) {
+        int i;
+        for (i = 0; i < 4; i++) {
+            $1[i] = (float) PyFloat_AsDouble(PySequence_GetItem($input, i));
+        }
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError, "Input must be a sequence of 4 floats.");
+        return NULL;
+    }
 }
 
 %typemap(out) Doordeck_Headless_Sdk_KVector128 {
-    memcpy($result, $input, 4 * sizeof(float));  // copying data from the array back to the vector
+    // Custom conversion from C vector to Python object (tuple)
+    PyObject *list = PyTuple_New(4);
+    int i;
+    for (i = 0; i < 4; i++) {
+        PyTuple_SetItem(list, i, PyFloat_FromDouble($1[i]));
+    }
+    $result = list;
 }
+
 
 %include "../../releaseShared/Doordeck.Headless.Sdk_api.h"
