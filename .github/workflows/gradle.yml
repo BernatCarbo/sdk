@@ -51,6 +51,8 @@ jobs:
         run: |
           python3 -c "import sysconfig; print(sysconfig.get_paths()['include'])"
           python3 -c "import sysconfig; print(sysconfig.get_paths()['stdlib'])"
+          python3-config --includes
+          python3-config --ldflags
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
