@@ -40,7 +40,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.13
-          architecture: x64
+
+      - name: Download windows python
+        run: |
+          curl -LO https://www.python.org/ftp/python/3.13.2/python-3.13.2-embed-amd64.zip
+          unzip python-3.13.2-embed-amd64.zip -d python-embedded
 
       - name: Install SWIG
         run: brew install swig
@@ -88,7 +92,7 @@ jobs:
             doordeck-sdk/build/bin/mingwX64/python/doordeck_headless_sdk/doordeck_headless_sdk_wrap.c \
             doordeck-sdk/build/bin/mingwX64/releaseShared/Doordeck.Headless.Sdk.dll \
             -I /opt/homebrew/Cellar/python@3.13/3.13.1/Frameworks/Python.framework/Versions/3.13/include/python3.13 \
-            -L /Users/bernat/Downloads/python-3.13.2-embed-amd64 \
+            -L /python-embedded \
             -lpython313
 
       - name: Create GitHub Release
