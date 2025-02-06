@@ -86,7 +86,7 @@ jobs:
           x86_64-w64-mingw32-gcc -shared -o doordeck-sdk/build/bin/mingwX64/python/doordeck_headless_sdk/_doordeck_headless_sdk.pyd \
             doordeck-sdk/build/bin/mingwX64/python/doordeck_headless_sdk/doordeck_headless_sdk_wrap.c \
             doordeck-sdk/build/bin/mingwX64/releaseShared/Doordeck.Headless.Sdk.dll \
-            -I /opt/homebrew/Cellar/python@3.13/3.13.1/Frameworks/Python.framework/Versions/3.13/include/python3.13 \
+            -I $(python3 -c "import sysconfig; print(sysconfig.get_paths()['include'])") \
             -L doordeck-sdk/build/bin/mingwX64/windows-python \
             -lpython313
 
