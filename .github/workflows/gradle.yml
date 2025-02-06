@@ -39,7 +39,8 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.12
+          python-version: 3.13
+          architecture: x64
 
       - name: Install SWIG
         run: brew install swig
@@ -86,9 +87,9 @@ jobs:
           x86_64-w64-mingw32-gcc -shared -o doordeck-sdk/build/bin/mingwX64/python/doordeck_headless_sdk/_doordeck_headless_sdk.pyd \
             doordeck-sdk/build/bin/mingwX64/python/doordeck_headless_sdk/doordeck_headless_sdk_wrap.c \
             doordeck-sdk/build/bin/mingwX64/releaseShared/Doordeck.Headless.Sdk.dll \
-            -I /Library/Frameworks/Python.framework/Versions/3.12/include/python3.12 \
-            -L /Library/Frameworks/Python.framework/Versions/3.12/lib \
-            -lpython3.12
+            -I /opt/homebrew/Cellar/python@3.13/3.13.1/Frameworks/Python.framework/Versions/3.13/include/python3.13 \
+            -L /Users/bernat/Downloads/python-3.13.2-embed-amd64 \
+            -lpython313
 
       - name: Create GitHub Release
         env:
