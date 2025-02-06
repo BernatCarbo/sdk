@@ -36,11 +36,6 @@ jobs:
           distribution: corretto
           java-version: 21
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.13
-
       - name: Download windows python
         run: |
           curl -LO https://www.python.org/ftp/python/3.13.2/python-3.13.2-embed-amd64.zip
