@@ -397,5 +397,8 @@ tasks.register("pythonPack").configure {
             from(file("$projectDir/src/mingwMain/resources/python"))
             into(outputDir)
         }
+        // Create src & tests folders
+        mkdir(file("$outputDir/${pypiPublish.packageName}/src"))
+        mkdir(file("$outputDir/${pypiPublish.packageName}/tests"))
     }
 }
