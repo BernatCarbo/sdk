@@ -42,9 +42,6 @@ jobs:
       - name: Install mingw-w64
         run: brew install mingw-w64
 
-      - name: Setup PIP
-        run: python3 -m pip install --upgrade pip
-
       - name: Print stuff
         run: |
           python3 -c "import sysconfig; print(sysconfig.get_paths()['include'])"
