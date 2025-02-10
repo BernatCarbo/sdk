@@ -387,9 +387,6 @@ tasks.register("csharpPack").configure {
 
 val pypiTemplate = """
 from setuptools import setup, find_packages
-from setuptools.command.build_ext import build_ext
-import os
-package_data_files = ["doordeck_headless_sdk/src/_doordeck_headless_sdk.pyd", "../releaseShared/Doordeck.Headless.Sdk.dll"]
 setup(
     name="${pypiPublish.packageName}",
     version="${project.version}",
@@ -414,24 +411,25 @@ setup(
 tasks.register("pythonPack").configure {
     doLast {
         val outputDir = file("$projectDir/build/bin/mingwX64/python")
+        mkdir(outputDir)
         // Create setup.py file
         val setupFile = file("$outputDir/setup.py")
         setupFile.writeText(pypiTemplate.trim())
+        // Copy README & LICENSE
         copy {
-            // Copy README & LICENSE
             from(rootProject.layout.projectDirectory.file("LICENSE"))
             from(rootProject.layout.projectDirectory.file("README.md"))
             into(outputDir)
         }
+        // Copy python resources
         copy {
-            // Copy python resources
             from(file("$projectDir/src/mingwMain/resources/python"))
             into(outputDir)
             include("**/*.i")
         }
         // Copy mingwX64 dll
         copy {
-            from(file("$projectDir/src/mingwMain/resources/releaseShared/Doordeck.Headless.Sdk.dll"))
+            from(file("$projectDir/build/bin/mingwX64/releaseShared/Doordeck.Headless.Sdk.dll"))
             into(file("$outputDir/src/${pypiPublish.packageName}"))
         }
         // Create empty __init__.py file
