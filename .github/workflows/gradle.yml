@@ -94,7 +94,7 @@ jobs:
             -L doordeck-sdk/build/bin/mingwX64/python/windows-python \
             -lpython313
 
-          python -m build doordeck-sdk/build/bin/mingwX64/python
+          python3 -m build doordeck-sdk/build/bin/mingwX64/python
 
       - name: Create GitHub Release
         env:
