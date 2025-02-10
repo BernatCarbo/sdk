@@ -20,6 +20,7 @@ private sealed class PublishData(
     val repository: String = "https://github.com/doordeck/doordeck-headless-sdk",
     val gitRepository: String = "https://github.com/doordeck/doordeck-headless-sdk.git",
     val author: String = "Doordeck Limited",
+    val authorEmail: String = "development@doordeck.com",
     val authorRepository: String = "https://github.com/doordeck",
     val authorHomepage: String = "https://www.doordeck.com",
     val licenseType: String = "Apache-2.0",
@@ -47,7 +48,8 @@ private data class NugetPublishData(
 ) : PublishData()
 
 private data class PyPiPublishData(
-    val packageName: String = "doordeck_headless_sdk"
+    val packageName: String = "doordeck_headless_sdk",
+    val keywords: List<String> = listOf("doordeck", "sdk", "access control")
 ) : PublishData()
 
 private val npmPublish = NpmPublishData()
@@ -383,14 +385,43 @@ tasks.register("csharpPack").configure {
     }
 }
 
+val pypiTemplate = """
+from setuptools import setup, find_packages
+from setuptools.command.build_ext import build_ext
+import os
+package_data_files = ["doordeck_headless_sdk/src/_doordeck_headless_sdk.pyd", "../releaseShared/Doordeck.Headless.Sdk.dll"]
+setup(
+    name="${pypiPublish.packageName}",
+    version="${project.version}",
+    description="${pypiPublish.description}",
+    url="${pypiPublish.authorHomepage}",
+    author="${pypiPublish.author}",
+    author_email="${pypiPublish.authorEmail}",
+    keywords="${pypiPublish.keywords.joinToString()}",
+    package_dir={"": "src"},
+    packages=find_packages(where="src"),
+    python_requires=">=3.6",
+    package_data={
+        "doordeck_headless_sdk": ["_doordeck_headless_sdk.pyd", "Doordeck.Headless.Sdk.dll"],
+    },
+    project_urls={
+        "Bug Reports": "${pypiPublish.issues}",
+        "Source": "${pypiPublish.gitRepository}",
+    },
+)
+""".trimIndent()
+
 tasks.register("pythonPack").configure {
     doLast {
         val outputDir = file("$projectDir/build/bin/mingwX64/python")
-        // Copy README & LICENSE
+        // Create setup.py file
+        val setupFile = file("$outputDir/setup.py")
+        setupFile.writeText(pypiTemplate.trim())
         copy {
+            // Copy README & LICENSE
             from(rootProject.layout.projectDirectory.file("LICENSE"))
             from(rootProject.layout.projectDirectory.file("README.md"))
-            into(file("$outputDir/${pypiPublish.packageName}"))
+            into(outputDir)
         }
         copy {
             // Copy python resources
@@ -398,8 +429,12 @@ tasks.register("pythonPack").configure {
             into(outputDir)
             include("**/*.i")
         }
-        // Create src & tests folders
-        mkdir(file("$outputDir/${pypiPublish.packageName}/src"))
-        mkdir(file("$outputDir/${pypiPublish.packageName}/tests"))
+        // Copy mingwX64 dll
+        copy {
+            from(file("$projectDir/src/mingwMain/resources/releaseShared/Doordeck.Headless.Sdk.dll"))
+            into(file("$outputDir/src/${pypiPublish.packageName}"))
+        }
+        // Create empty __init__.py file
+        file("$outputDir/src/${pypiPublish.packageName}/__init__.py").createNewFile()
     }
 }
