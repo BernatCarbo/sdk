@@ -72,7 +72,7 @@ jobs:
 
       - name: Publish to PyPi
         env:
-          TWINE_USERNAME: __token__
+          TWINE_USERNAME: "__token__"
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
           ./gradlew -Prelease.useLastTag=true pythonPack
