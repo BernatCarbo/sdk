@@ -75,7 +75,7 @@ jobs:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          ./gradlew pythonPack
+          ./gradlew -Prelease.useLastTag=true pythonPack
           
           # Download python for windows
           curl -LO https://www.python.org/ftp/python/3.13.2/python-3.13.2-embed-amd64.zip
