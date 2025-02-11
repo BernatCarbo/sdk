@@ -49,7 +49,10 @@ jobs:
           python3 -m pip install --upgrade twine
 
       - name: Setup python build
-        run: python3 -m pip install --upgrade build
+        run: |
+          python3 -m venv github
+          source github/bin/activate
+          python3 -m pip install --upgrade build
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -96,6 +99,8 @@ jobs:
             -L doordeck-sdk/build/bin/mingwX64/python/windows-python \
             -lpython313
 
+          python3 -m venv github
+          source github/bin/activate
           python3 -m build doordeck-sdk/build/bin/mingwX64/python
           
           python3 -m twine upload --repository doordeck-sdk/build/bin/mingwX64/python/dist/*
