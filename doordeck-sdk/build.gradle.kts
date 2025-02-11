@@ -370,6 +370,7 @@ val nuspecTemplate = """
 tasks.register("csharpPack").configure {
     doLast {
         val outputDir = file("$projectDir/build/bin/mingwX64/releaseShared/csharp")
+        mkdir(outputDir)
         val nuspecFile = file("$outputDir/${nugetPublish.packageName}.nuspec")
         nuspecFile.writeText(nuspecTemplate.trim())
         // Copy the readme file
