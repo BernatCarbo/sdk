@@ -405,9 +405,6 @@ authors = [{ name = "${pypiPublish.author}", email = "${pypiPublish.authorEmail}
 "Source" = "${pypiPublish.gitRepository}"
 [tool.setuptools]
 package-data = { "doordeck_headless_sdk" = ["_doordeck_headless_sdk.pyd", "Doordeck.Headless.Sdk.dll"] }
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["doordeck_headless_sdk*"]
 """.trimIndent()
 
 tasks.register("pythonPack").configure {
