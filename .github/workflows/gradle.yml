@@ -97,8 +97,7 @@ jobs:
             doordeck-sdk/build/bin/mingwX64/releaseShared/Doordeck.Headless.Sdk.dll \
             -I $(python3 -c "import sysconfig; print(sysconfig.get_paths()['include'])") \
             -L doordeck-sdk/build/bin/mingwX64/python/windows-python \
-            -lpython313 \
-            -static-libgcc -static-libstdc++
+            -lpython313
 
           python3 -m venv github
           source github/bin/activate
