@@ -395,7 +395,7 @@ name = "${pypiPublish.packageName}"
 version = "${project.version}"
 description = "${pypiPublish.description}"
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = "3.13"
 license = { file = "LICENSE.txt" }
 keywords = [${pypiPublish.keywords.joinToString(separator = ", ") { "\"$it\"" }}]
 authors = [{ name = "${pypiPublish.author}", email = "${pypiPublish.authorEmail}" }]
