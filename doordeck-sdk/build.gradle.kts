@@ -48,7 +48,7 @@ private data class NugetPublishData(
 ) : PublishData()
 
 private data class PyPiPublishData(
-    val packageName: String = "doordeck-headless-sdk",
+    val packageName: String = "doordeck_headless_sdk",
     val keywords: List<String> = listOf("doordeck", "sdk", "access control")
 ) : PublishData()
 
