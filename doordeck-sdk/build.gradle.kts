@@ -408,10 +408,8 @@ classifiers = [
 "Homepage" = "${pypiPublish.authorHomepage}"
 "Source" = "${pypiPublish.gitRepository}"
 "Issue tracker" = "${pypiPublish.issues}"
-[tool.setuptools.packages.find]
-where = ["${pypiPublish.packageName}"]
-[tool.setuptools.package-data]
-${pypiPublish.packageName} = ["_doordeck_headless_sdk.pyd", "Doordeck.Headless.Sdk.dll"]
+[tool.setuptools]
+package-data = { "doordeck_headless_sdk" = ["_doordeck_headless_sdk.pyd", "Doordeck.Headless.Sdk.dll"] }
 """.trimIndent()
 
 tasks.register("pythonPack").configure {
