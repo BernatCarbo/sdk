@@ -402,7 +402,7 @@ authors = [{ name = "${pypiPublish.author}", email = "${pypiPublish.authorEmail}
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Programming Language :: Python :: 3.13",
-  "Operating System :: Microsoft :: Windows"
+  "Operating System :: Microsoft :: Windows",
 ],
 [project.urls]
 "Homepage" = "${pypiPublish.authorHomepage}"
