@@ -1,4 +1,4 @@
-%module doordeck_headless_sdk
+%module doordeck.sdk
 
 // Include sdk interfaces
 %include "imports.i"
