@@ -410,7 +410,7 @@ classifiers = [
 "Issue tracker" = "${pypiPublish.issues}"
 [tool.setuptools.packages.find]
 where = ["${pypiPublish.packageName}"]
-[tool.setuptools]
+[tool.setuptools.package-data]
 ${pypiPublish.packageName} = ["_doordeck_headless_sdk.pyd", "Doordeck.Headless.Sdk.dll"]
 """.trimIndent()
 
