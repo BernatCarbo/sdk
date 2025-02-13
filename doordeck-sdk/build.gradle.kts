@@ -409,7 +409,7 @@ classifiers = [
 "Source" = "${pypiPublish.gitRepository}"
 "Issue tracker" = "${pypiPublish.issues}"
 [tool.setuptools]
-package-data = { "doordeck_headless_sdk" = ["_doordeck_headless_sdk.pyd", "Doordeck.Headless.Sdk.dll"] }
+package-data = { "${pypiPublish.packageName}" = ["_doordeck_headless_sdk.pyd", "${nugetPublish.packageName}.dll"] }
 """.trimIndent()
 
 tasks.register("pythonPack").configure {
