@@ -409,7 +409,6 @@ classifiers = [
 "Source" = "${pypiPublish.gitRepository}"
 "Issue tracker" = "${pypiPublish.issues}"
 [tool.setuptools]
-include-package-data = true
 package-data = { "doordeck-headless-sdk" = ["_doordeck_headless_sdk.pyd", "Doordeck.Headless.Sdk.dll"] }
 """.trimIndent()
 
